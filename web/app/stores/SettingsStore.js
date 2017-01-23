@@ -62,7 +62,8 @@ class SettingsStore {
                 "ko",
                 "de",
                 "es",
-                "tr"
+                "tr",
+                "ru"
             ],
             apiServer: [
                 "wss://testnet.bitshares.eu/ws",
