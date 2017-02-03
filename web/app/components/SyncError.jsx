@@ -4,22 +4,13 @@ import BlockchainStore from "stores/BlockchainStore";
 import SettingsStore from "stores/SettingsStore";
 import Translate from "react-translate-component";
 import SettingsActions from "actions/SettingsActions";
-import {Apis} from "graphenejs-ws";
+import {Apis} from "bitsharesjs-ws";
 import Icon from "./Icon/Icon";
 import WebsocketAddModal from "./Settings/WebsocketAddModal";
 
-class InitError extends React.Component {
-
-    static getStores() {
-
-    }
-
-    static getPropsFromStores() {
-
-    }
+class SyncError extends React.Component {
 
     triggerModal(e) {
-        console.log("triggerModal:");
         this.refs.ws_modal.show(e);
     }
 
@@ -36,7 +27,7 @@ class InitError extends React.Component {
             window.location.hash = "";
             window.remote.getCurrentWindow().reload();
         }
-        else window.location.href = "/";
+        else window.location.href = __BASE_URL__ + "/";
     }
 
     onReset() {
@@ -106,7 +97,7 @@ class InitError extends React.Component {
     }
 }
 
-InitError = connect(InitError, {
+SyncError = connect(SyncError, {
     listenTo() {
         return [BlockchainStore, SettingsStore];
     },
@@ -120,4 +111,4 @@ InitError = connect(InitError, {
     }
 });
 
-export default InitError;
+export default SyncError;

@@ -14,7 +14,7 @@ import TransactionConfirmStore from "stores/TransactionConfirmStore";
 import LoadingIndicator from "../LoadingIndicator";
 import WalletActions from "actions/WalletActions";
 import Translate from "react-translate-component";
-import {ChainStore, FetchChain} from "graphenejs-lib/es";
+import {ChainStore, FetchChain} from "bitsharesjs/es";
 import {BackupCreate} from "../Wallet/Backup";
 import ReactTooltip from "react-tooltip";
 import utils from "common/utils";
@@ -218,6 +218,12 @@ class CreateAccount extends React.Component {
                     <label style={{textTransform: "none"}}>
                         <Link to="/existing-account">
                             <Translate content="wallet.restore" />
+                        </Link>
+                    </label>
+
+                    <label style={{textTransform: "none"}}>
+                        <Link to="/create-wallet-brainkey">
+                            <Translate content="settings.backup_brainkey" />
                         </Link>
                     </label>
                 </div>

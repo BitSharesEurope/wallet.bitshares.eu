@@ -182,6 +182,7 @@ class OrderBook extends React.Component {
             let asksContainer = this.refs.hor_asks;
             Ps.initialize(asksContainer);
         }
+
     }
 
     psUpdate() {

@@ -4,7 +4,7 @@ import classnames from "classnames";
 import AssetActions from "actions/AssetActions";
 import HelpContent from "../Utility/HelpContent";
 import utils from "common/utils";
-import {ChainStore, ChainValidation} from "graphenejs-lib/es";
+import {ChainStore, ChainValidation} from "bitsharesjs/es";
 import FormattedAsset from "../Utility/FormattedAsset";
 import counterpart from "counterpart";
 import ChainTypes from "../Utility/ChainTypes";
@@ -426,11 +426,11 @@ class AccountAssetCreate extends React.Component {
             amount = utils.limitByPrecision(e.target.value, this.state.update.precision);
             asset = null;
         } else {
-            if (!e || "amount" in e) {
+            if (!e || !("amount" in e)) {
                 return;
             }
             amount = e.amount == "" ? "0" : utils.limitByPrecision(e.amount.replace(/,/g, ""), this.props.core.get("precision"));
-            asset = e.asset.get("id")
+            asset = e.asset.get("id");
         }
 
         let {core_exchange_rate} = this.state;
@@ -534,7 +534,7 @@ class AccountAssetCreate extends React.Component {
                     <Tabs setting="createAssetTab" style={{maxWidth: "800px"}} contentClass="grid-block shrink small-vertical medium-horizontal">
 
                         <Tab title="account.user_issued_assets.primary">
-                            <div className="small-12 large-6 grid-content">
+                            <div className="small-12 grid-content">
                                 <h3><Translate content="account.user_issued_assets.primary" /></h3>
                                 <label><Translate content="account.user_issued_assets.symbol" />
                                     <input type="text" value={update.symbol} onChange={this._onUpdateInput.bind(this, "symbol")}/>
@@ -549,8 +549,10 @@ class AccountAssetCreate extends React.Component {
 
                                 <label>
                                     <Translate content="account.user_issued_assets.decimals" />
-                                    <input type="number" value={update.precision} onChange={this._onUpdateInput.bind(this, "precision")} />
+                                    <input min="0" max="8" step="1" type="range" value={update.precision} onChange={this._onUpdateInput.bind(this, "precision")} />
                                 </label>
+                                <p>{update.precision}</p>
+
                                 <div style={{marginBottom: 10}} className="txtlabel cancel"><Translate content="account.user_issued_assets.precision_warning" /></div>
 
                                 <table className="table" style={{width: "inherit"}}>
@@ -619,7 +621,12 @@ class AccountAssetCreate extends React.Component {
                                     <div>
                                         <h5>
                                             <Translate content="exchange.price" />
-                                            <span>: {utils.get_asset_price(core_exchange_rate.quote.amount * utils.get_asset_precision(update.precision), {precision: update.precision}, core_exchange_rate.base.amount * utils.get_asset_precision(core), core)}</span>
+                                            <span>: {utils.format_number(utils.get_asset_price(
+                                                core_exchange_rate.quote.amount * utils.get_asset_precision(update.precision),
+                                                {precision: update.precision},
+                                                core_exchange_rate.base.amount * utils.get_asset_precision(core),
+                                                core
+                                            ), 2 + (update.precision || 8))}</span>
                                             <span> {update.symbol}/{core.get("symbol")}</span>
                                         </h5>
                                     </div>
@@ -628,7 +635,7 @@ class AccountAssetCreate extends React.Component {
                         </Tab>
 
                         <Tab title="account.user_issued_assets.description">
-                            <div className="small-12 large-8 grid-content">
+                            <div className="small-12 grid-content">
                                 <Translate component="h3" content="account.user_issued_assets.description" />
                                 <label>
                                     <textarea
@@ -696,21 +703,25 @@ class AccountAssetCreate extends React.Component {
                             </Tab>) : null}
 
                         <Tab title="account.permissions">
-                            <div className="small-12 large-6 grid-content">
+                            <div className="small-12 grid-content">
+                                <div style={{maxWidth: 800}}>
                                 <HelpContent
                                     path = {"components/AccountAssetCreate"}
                                     section="permissions"
                                 />
+                                </div>
                                 {permissions}
                             </div>
                         </Tab>
 
                         <Tab title="account.user_issued_assets.flags">
-                            <div className="small-12 large-6 grid-content">
-                                <HelpContent
-                                    path = {"components/AccountAssetCreate"}
-                                    section="flags"
-                                />
+                            <div className="small-12 grid-content">
+                                <div style={{maxWidth: 800}}>
+                                    <HelpContent
+                                        path = {"components/AccountAssetCreate"}
+                                        section="flags"
+                                    />
+                                </div>
                                 {permissionBooleans["charge_market_fee"] ? (
                                     <div>
                                         <Translate component="h3" content="account.user_issued_assets.market_fee" />

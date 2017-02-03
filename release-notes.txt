@@ -1,181 +1,30 @@
----------------------------------------------------------------------
-Release 2.0.170201
----------------------------------------------------------------------
-New features
-- Charting revamp: new charts using [react-stockchart](https://github.com/rrag/react-stockcharts)
-- Russian language translation thanks to @testzcrypto
-- Add brainkey restoration to create-account, improve brainkey restoration
-- All open orders, collateral and debt are now included when estimating total account value on the account screen
-- A 'Borrow' action added to the account assets table
-- A 'Reset settings' button added to the Settings page
-- Dates have been added to the Chat (requires implementation by other clients like Openledger also)
-- Hide 'OPEN.' prefix from Openledger assets
-- The dashboard market cards have been modified to be more clear
-
-- Hempsweet UIA symbol added ahead of their launch
-
-Bug fixes
---------
-- Many tweaks and fixes to colors, positioning and more
-- Make sure transfer asset stays synced
-- Fix bug in CER input during asset creation
-- Move 'show hidden accounts' inside DashboardList, improve the layout
 
 ---------------------------------------------------------------------
-Release 2.0.170123
----------------------------------------------------------------------
-Bug fixes
---------
-- Use relative paths for fetching assets, fixed wallet creation issues
-- Fix some links in the light wallets
-- Fix market flipping for UIAs
-- Fix several bugs related to hash-history react router config
-- Change Graphene to BitShares
-- Replace graphenejs-lib with bitsharesjs
-- Fix npm errors
-- Fix line breaks for memos with very long words
-- Make sure asset actions render properly in AccountOverview
-- Ensure proxy accounts get resolved properly in Voting
-
----------------------------------------------------------------------
-Release 2.0.170118
+Release 2.0.160514
 ---------------------------------------------------------------------
 
 New features
 --------
-- Helpul tooltips have been added in multiple locations, such as login/unlock, margin mechanics ++
-- Proposed transaction summaries added to transaction history lists
-- Always display settings cog in header
+- Simple p2p chat history
+- More improvements to the deposit/withdraw screens
+- Make trollbox dockable on right side
+- Use separate support addresses for OpenLedger and BlockTrades deposits
+- Add OPEN.ETH:OPEN.DAO market to featured markets
 
 Bug fixes
 --------
-- Fix display of asset page for bit assets with no valid feeds
-- Remove maximum_short_squeeze_ratio requirement for minimum collateral
-- Base Call Order forSale/toReceive calculation on debt instead of collateral
-- Fix TimeAgo tooltip positioning
-- Hide 'show hidden assets' button when no assets are hidden
-- Update Chinese translations
-- Set depth chart xaxis properly when no asks are present
-- Fix price being set when clicking on orderbook order
-- Add a tooltip explaning that buy amounts are minimum to receive
-- Filter call orders on feed update
-
----------------------------------------------------------------------
-Release 2.0.170116-rc1
----------------------------------------------------------------------
-
-New features
---------
-- Major refactor of market handling: improved order matching and market data processing
-- Upgrade to Webpack 2, add ES6 code splitting and dynamic route loading
-- [Blocktrades] Add internal conversion
-- Major package upgrades: react, react-router, alt, file-saver ++
-- Use Roboto font everywhere by default
-- Add Equivalent values to Worker table, improve layout
-- Add a warning for disabled markets and disable buy/sell
-- Only redirect to account creation on direct navigation to "/"
-- Update default markets and add some asset symbols
-
-Bug fixes
---------
-- [Blocktrades] Fix 'Calculating Internal Server Error'
-- [Blocktrades] Fix displaying 'Deposit limit' for 'Internal conversion'
-- [Blocktrades] Fix copy/paste for memo
-- Fix dropdown font colors
-- Fix missing connection translation key
-- Improve multi-sig signing handling, exclude owner keys if not needed
-- Hide tooltips on navigation
-- Fix Account active state in Header
-- Change 'No price available' to 'Unknown', and add a tooltip
-- Fix account creation and dictionary loading
-- Fix orderbook show more button
-- Fix some invalid JSON
-
----------------------------------------------------------------------
-Release 2.0.161031
----------------------------------------------------------------------
-
-New features
---------
-- Add Blockpay to default markets and update markets list
-- Add btsabs and Transwiser API servers
-- Allow the Chat box to be hidden from a docked state
-- Vesting balance amounts are now updated correctly, and a Try claim all button has been added
-- Chinese translation updates
-- MetaExchange has been removed from the deposit withdraw providers
-
-Bug fixes
---------
-- Add BitShares bloom filter for BTS 1 account imports
-- Fix a GenesisFilter bug and update ImportKeys flow slightly
-- Fix input of uppercase characters in AccountPermissions
-- Fix Highcharts build issues
-- Remove unused refcode inputs
-
----------------------------------------------------------------------
-Release 2.0.160829
----------------------------------------------------------------------
-
-New features
---------
-- Hash checksums for all binaries
-- Add copy address/memo buttons to deposit, improve mobile layout
-- Improve transfer layout, add exchange scam account warnings
-- Add option to move BuySell below Orderbook
-- Add brainkey option to Settings Restore page
-- Add API selection to SyncError page, improve the error message
-
-Bug fixes
---------
-- Fix price display in MarketCards
-- Add proposed operation id to summary
-- Add deposit/withdraw to mobile menu
-- Fix hiding of disabled chat window
-- Fix WalletCreate submit with invalid inputs, close #860
-- Fix BackupBrainkey navigation
-- Hide input spinner in Firefox
-- Use newest version of node-libs-browser, fixes backups in Firefox close
-- Fix HelpContent 'en' locale fallback
-
----------------------------------------------------------------------
-Release 2.0.160813
----------------------------------------------------------------------
-
-New features
---------
-- Refactor account creation
-- Disable chart indicators by default
-- BlockTrades deposit/withdraw improvements
-- Update Featured assets, add ICOO/PeerPlays
-- Change depth chart tooltip to table layout
-- Restore the Account link to the Header
-- Disable Chat by default, make it easier to enable/disable
-- Add current price to Dashboard MarketCards
-
-Bug fixes
---------
-- Rearrange Exchange components and improve responsive behaviour
-- Adjust DepthChart min/max range
-- Prevent infinite loop on bad system clock, add warning
-- Filter out duplicate welcome messages from chat history
-- Fix Orderbook click calculation
-- Fix buy side order book click total calculation
-- Fix for 1.0 balance claims
-
----------------------------------------------------------------------
-Release 2.0.160702
----------------------------------------------------------------------
-Bug fixes
---------
-- Display 'New wallet' button for users with only one wallet
-- Fix light wallet local file loading, use data-urls for some pngs
-- Remove back call on wallet deletion
-- Update electron version
-- Center-align the advanced features button
-- Fix backup restore submit button
-- Fix api error redirection
-- Fix Backup restore accept button close #858
-- Fix initError loading issues and layout
+- Fix Settings page issue with chat disable
+- Fix settings page causing the GUI to freeze (#842)
+- Improvements to trollbox server to ensure uptime
+- Fix chatbox select box height (thanks to nmywn)
+- Turkish translation updates
+- Add some filtering to BlockTrades coins to prevent errors
+- Separate price and volume slightly in PriceChart, adjust colors
+- Improve depth chart zoom level
+- Improve Footer hide behaviour
+- Fix trollbox mem leak and connection counter, improve error handling #844
+- Update packages: react to 15.0.2, react-highcharts, fix breaking changes
+- Fix an AccountSelector bug causing name resets while typing
 
 ---------------------------------------------------------------------
 Release 2.0.160629
@@ -183,8 +32,8 @@ Release 2.0.160629
 
 New features
 --------
-- Api code moved to new graphenejs-ws library
-- Crypto and blockchain state code moved to graphenejs-lib library
+- Api code moved to new [bitsharesjs-ws](https://github.com/svk31/bitsharesjs-ws) library
+- Crypto and blockchain state code moved to [bitsharesjs](https://github.com/svk31/bitsharesjs) library
 - Add OPEN.MKR deposit/withdrawal
 - Limit chat messages to 140 characters
 - Refactor MyMarkets selection to tabbed layout

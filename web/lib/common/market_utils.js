@@ -1,5 +1,5 @@
 import utils from "./utils";
-import {ChainStore, ChainTypes} from "graphenejs-lib/es";
+import {ChainStore, ChainTypes} from "bitsharesjs/es";
 let {object_type} = ChainTypes;
 let opTypes = Object.keys(object_type);
 
@@ -13,7 +13,7 @@ const MarketUtils = {
     },
 
     isAsk(order, base) {
-        let baseId = base.toJS ? base.get("id") : base.id;;
+        let baseId = base.toJS ? base.get("id") : base.id;
 
         if (order.sell_price) {
             return order.sell_price.quote.asset_id === baseId;

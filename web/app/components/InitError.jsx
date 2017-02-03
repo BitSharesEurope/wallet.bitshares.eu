@@ -5,12 +5,11 @@ import SettingsStore from "stores/SettingsStore";
 import Translate from "react-translate-component";
 import WebsocketAddModal from "./Settings/WebsocketAddModal";
 import SettingsActions from "actions/SettingsActions";
-import {Apis} from "graphenejs-ws";
+import {Apis} from "bitsharesjs-ws";
 
 class InitError extends React.Component {
 
     triggerModal(e) {
-        console.log("triggerModal:");
         this.refs.ws_modal.show(e);
     }
 
@@ -27,7 +26,7 @@ class InitError extends React.Component {
             window.location.hash = "";
             window.remote.getCurrentWindow().reload();
         }
-        else window.location.href = "/";
+        else window.location.href = __BASE_URL__ + "/";
     }
 
     onReset() {

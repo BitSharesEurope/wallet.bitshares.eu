@@ -2,7 +2,7 @@ var numeral = require("numeral");
 
 let id_regex = /\b\d+\.\d+\.(\d+)\b/;
 
-import {ChainTypes} from "graphenejs-lib/es";
+import {ChainTypes} from "bitsharesjs/es";
 var {object_type, operations} = ChainTypes;
 
 var Utils = {
@@ -490,9 +490,12 @@ var Utils = {
             }
         }
 
+        let prefix = isBitAsset ? "bit" : toReplace[i] ? toReplace[i].toLowerCase() : null;
+        if (prefix === "open.") prefix = "";
+
         return {
             name,
-            prefix: isBitAsset ? "bit" : toReplace[i] ? toReplace[i].toLowerCase() : null
+            prefix
         };
     }
 };

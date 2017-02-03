@@ -9,7 +9,7 @@
     "tr": "Türkçe"
   },
   "header": {
-    "title": "Bitshares 2.0",
+    "title": "BitShares",
     "account": "Hesap",
     "dashboard": "Ana Sayfa",
     "explorer": "İncele",
@@ -46,14 +46,17 @@
     "cr_danger": "This position is currently being margin called. Consider adding collateral to bring the collateral ratio above %(mr)s or closing the position.",
     "cr_warning": "This position has a low level of collateral, and will get margin called if the collateral ratio drops below %(mr)s. Consider adding collateral or closing the position.",
     "propose_scam": "This proposal was created by a known scammer, do not approve it!",
-    "login": "This Bitshares wallet does not offer a traditional login but instead simply locks or unlocks a wallet that is <b>only</b> stored locally in your browser.<br/><br/>Whenever you close the wallet it will be locked and you will effectively be logged out.",
-    "buy_min": "You will receive at minimum this amount. If there are matching orders with a cheaper price than you specified, you will receive more than this amount."
+    "login": "This BitShares wallet does not offer a traditional login but instead simply locks or unlocks a wallet that is <b>only</b> stored locally in your browser.<br/><br/>Whenever you close the wallet it will be locked and you will effectively be logged out.",
+    "buy_min": "You will receive at minimum this amount. If there are matching orders with a cheaper price than you specified, you will receive more than this amount.",
+    "borrow": "Borrow %(asset)s from the network. This creates a smart contract that locks your collateral until you either modify the position or a margin call is required."
   },
   "propose": "Teklif Et",
   "cancel": "İptal",
   "account": {
+    "in_open": "This is the amount of %(asset)s you have in open orders.",
+    "total_estimate": "This is the estimated value of all your assets, including any hidden assets, open orders, debt and collateral. The estimate is done using only live blockchain data and may not be perfectly accurate.",
     "trade": "Trade",
-    "welcome": "Bitshares'e Hoşgeldiniz",
+    "welcome": "BitShares'e Hoşgeldiniz",
     "asset": "Dijital Varlık",
     "market_value": "Piyasa Değeri",
     "hour_24": "24 Saat",
@@ -214,6 +217,7 @@
       "sign_owner": "Sign as owner"
     },
     "votes": {
+      "proxy_current": "Your current proxy is",
       "proxy_short": "Vekil",
       "workers_short": "Geliştiriciler",
       "proxy": "Vekil Oy Hesabı",
@@ -708,10 +712,11 @@
     "lightTheme": "Açık tema",
     "olDarkTheme": "Openledger koyu",
     "reset": "Ayarları sıfırla",
-    "disableChat": "Sohbeti etkinsizleştir"
+    "disableChat": "Sohbeti etkinsizleştir",
+    "restore_default_success": "Settings have been reset successfully"
   },
   "footer": {
-    "title": "Graphene",
+    "title": "BitShares",
     "block": "Başat blok",
     "loading": "Yükleniyor...",
     "backup": "Yedekleme Gerekli",
@@ -720,6 +725,23 @@
     "brainkey": "TekAnahtar yedeklemesi tavsiye edilir."
   },
   "exchange": {
+    "chart_options": {
+        "tools": "Tools",
+        "title": "Indicators",
+        "sma": "SMA",
+        "ema1": "EMA 1",
+        "ema2": "EMA 2",
+        "smaVolume": "SMA",
+        "macd": "MACD chart",
+        "bb": "Bollinger Bands",
+        "fib": "Draw Fibonacci retracement",
+        "trendline": "Draw trend line",
+        "volume": "Show volume chart",
+        "period": "Period",
+        "height": "Chart height",
+        "price_title": "Price indicators",
+        "volume_title": "Volume indicators"
+    },
     "market": "Piyasa",
     "price_history": "Fiyat Tablosu",
     "order_depth": "Piyasa Derinliği",
@@ -864,7 +886,6 @@
     "unclaimed": "Sahiplenilmemiş",
     "unclaimed_vesting": "Çekilebilecek miktar",
     "no_accounts": "Hesap Yok",
-    "brainkey_no_match": "TekAnahtar uyuşmuyor, devam et",
     "reenter_brainkey": "TekAnahtarı tekrar gir",
     "pwd4brainkey": "Beyin-anahtarını göstermek için parolayı gir",
     "show_brainkey": "Beyin Anahtarını Göster",
@@ -998,7 +1019,7 @@
     "user": "Kullanıcı adı",
     "done": "Tamam",
     "reconnect": "Tekrar bağlan",
-    "welcome_user": "Bitshares'e Hoşgeldiniz",
+    "welcome_user": "BitShares'e Hoşgeldiniz",
     "users": "%(count)s kullanıcı çevrimiçi",
     "welcome": "Bu yöneticisi olmayan ve kullanıcı adlarının gerçek olmama ihtimali olan P2P bir sohbet odasıdır. Ayarlardan kapatılabilir. 2 saniyede 1 mesaj olarak sınırlıdır. Mevcut komutlar için /help yazın.",
     "disconnected": "Şu anda hiçbir ağa ya da sunucuya bağlı değilsiniz, lütfen aşağı tıklayarak tekrar bağlanınız. Bağlanamıyorsanız, bu sunucu çalışmıyor demektir, lütfen sonra tekrar deneyiniz.",

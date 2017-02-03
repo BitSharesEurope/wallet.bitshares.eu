@@ -4,19 +4,59 @@ import DashboardList from "./DashboardList";
 import { RecentTransactions } from "../Account/RecentTransactions";
 import Translate from "react-translate-component";
 import MarketCard from "./MarketCard";
+import utils from "common/utils";
+// import { Apis } from "bitsharesjs-ws";
 
 class Dashboard extends React.Component {
-
 
     constructor() {
         super();
         this.state = {
             width: null,
-            showIgnored: false
+            showIgnored: false,
+            featuredMarkets: [
+                ["BTS", "CNY"],
+                ["OPEN.BTC", "BTS", false],
+                ["OPEN.BTC", "OPEN.STEEM"],
+                ["BTS", "ICOO"],
+                ["BTS", "BLOCKPAY"],
+                ["BTS", "OBITS"],
+                ["BTS", "USD"],
+                ["BTS", "GOLD"],
+                ["BTS", "SILVER"],
+                ["USD", "OPEN.BTC"],
+                ["OPEN.BTC", "OPEN.DGD", false],
+                ["BTS", "BTWTY"],
+                ["USD", "OPEN.USDT"],
+                ["OPEN.BTC", "OPEN.INCNT"],
+                [ "BTS", "OPEN.ETH"],
+                ["CNY", "USD"]
+                // ["BTS", "SILVER"]
+                // ["BTS", "EUR"]
+            ],
+            newAssets: [
+
+            ]
         };
 
         this._setDimensions = this._setDimensions.bind(this);
     }
+
+    // componentWillMount() {
+    //     fetch(__UI_API__ + `/markets/${Apis.instance().chain_id.substr(0, 10)}`).then( (reply) => {
+    //         if (reply.ok) {
+    //             return reply.json().then(({markets, newAssets}) => {
+    //                 console.log("markets:", markets, newAssets);
+    //                 this.setState({
+    //                     featuredMarkets: markets.length ? markets: this.state.featuredMarkets,
+    //                     newAssets: newAssets.length ? newAssets : this.state.newAssets
+    //                 });
+    //             });
+    //         }
+    //     }).catch(err => {
+    //         console.log("Markets API not available:", err);
+    //     });
+    // }
 
     componentDidMount() {
         this._setDimensions();
@@ -26,6 +66,8 @@ class Dashboard extends React.Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         return (
+            !utils.are_equal_shallow(nextState.featuredMarkets, this.state.featuredMarkets) ||
+            !utils.are_equal_shallow(nextState.newAssets, this.state.newAssets) ||
             nextProps.linkedAccounts !== this.props.linkedAccounts ||
             nextProps.ignoredAccounts !== this.props.ignoredAccounts ||
             nextState.width !== this.state.width ||
@@ -53,38 +95,12 @@ class Dashboard extends React.Component {
 
     render() {
         let {linkedAccounts, myIgnoredAccounts} = this.props;
-        let {width, showIgnored} = this.state;
+        let {width, showIgnored, featuredMarkets, newAssets} = this.state;
 
         let names = linkedAccounts.toArray().sort();
         let ignored = myIgnoredAccounts.toArray().sort();
 
         let accountCount = linkedAccounts.size + myIgnoredAccounts.size;
-
-        let featuredMarkets = [
-            ["BTS", "CNY"],
-            ["OPEN.BTC", "BTS", false],
-            ["OPEN.BTC", "OPEN.STEEM"],
-            ["BTS", "ICOO"],
-            ["BTS", "BLOCKPAY"],
-            ["BTS", "OBITS"],
-            ["BTS", "USD"],
-            ["BTS", "GOLD"],
-            ["BTS", "SILVER"],
-            ["BTS", "BKT"],
-            ["OPEN.BTC", "OPEN.DGD", false],
-            ["BTS", "BTWTY"],
-            ["BTS", "BTSR"],
-            ["OPEN.BTC", "OPEN.INCNT", false],
-            [ "BTS", "OPEN.ETH"],
-            ["CNY", "USD"]
-            // ["BTS", "SILVER"]
-            // ["BTS", "EUR"]
-        ];
-
-        let newAssets = [
-            "OPEN.DAO",
-            "OPEN.LISK"
-        ];
 
         let markets = featuredMarkets.map((pair, index) => {
 
@@ -121,20 +137,14 @@ class Dashboard extends React.Component {
                             <Translate content="account.accounts" />
                         </div>
                         <div className="box-content">
-                            <DashboardList accounts={Immutable.List(names)} width={width} />
-                            {myIgnoredAccounts.size ?
-                                <table className="table table-hover" style={{fontSize: "0.85rem"}}>
-                                    <tbody>
-                                        <tr>
-                                            <td colSpan={width < 750 ? "3" : "4"} style={{textAlign: "right"}}>
-                                                <div onClick={this._onToggleIgnored.bind(this)} className="button outline">
-                                                    <Translate content={`account.${ showIgnored ? "hide_ignored" : "show_ignored" }`} />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table> : null}
-                            {showIgnored ? <DashboardList compact accounts={Immutable.List(ignored)} width={width} /> : null}
+                            <DashboardList
+                                accounts={Immutable.List(names)}
+                                ignoredAccounts={Immutable.List(ignored)}
+                                width={width}
+                                onToggleIgnored={this._onToggleIgnored.bind(this)}
+                                showIgnored={showIgnored}
+                            />
+                            {/* {showIgnored ? <DashboardList accounts={Immutable.List(ignored)} width={width} /> : null} */}
                         </div>
                     </div> : null}
 

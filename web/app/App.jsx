@@ -1,5 +1,5 @@
-import {ChainStore} from "graphenejs-lib/es";
-import {Apis} from "graphenejs-ws";
+import {ChainStore} from "bitsharesjs/es";
+import {Apis} from "bitsharesjs-ws";
 import React from "react";
 import IntlStore from "stores/IntlStore";
 import AccountStore from "stores/AccountStore";
@@ -140,8 +140,7 @@ class App extends React.Component {
     // }
 
     render() {
-        let {disableChat, isMobile, showChat, dockedChat} = this.state;
-
+        let {disableChat, isMobile, showChat, dockedChat, theme} = this.state;
         let content = null;
 
         let showFooter = this.props.location.pathname.indexOf("market") === -1;
@@ -175,10 +174,11 @@ class App extends React.Component {
                         </div>
                     </div>
                     {showFooter ? <Footer synced={this.state.synced}/> : null}
-                    <ReactTooltip ref="tooltip" place="top" type="light" effect="solid"/>
+                    <ReactTooltip ref="tooltip" place="top" type={theme === "lightTheme" ? "dark" : "light"} effect="solid"/>
                 </div>
             );
         }
+
         return (
             <div style={{backgroundColor: !this.state.theme ? "#2a2a2a" : null}} className={this.state.theme}>
                 <div id="content-wrapper">

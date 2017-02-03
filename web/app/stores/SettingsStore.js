@@ -1,7 +1,7 @@
-var alt = require("alt-instance");
+import alt from "alt-instance";
 import SettingsActions from "actions/SettingsActions";
 import IntlActions from "actions/IntlActions";
-var Immutable = require("immutable");
+import Immutable from "immutable";
 import {merge} from "lodash";
 import ls from "common/localStorage";
 
@@ -16,7 +16,7 @@ class SettingsStore {
 
         this.defaultSettings = Immutable.Map({
             locale: "en",
-            apiServer: "wss://node.testnet.bitshares.eu/ws",
+            apiServer: "wss://node.testnet.bitshares.eu",
             faucet_address: "https://faucet.testnet.bitshares.eu",
             unit: CORE_ASSET,
             showSettles: false,
@@ -51,7 +51,7 @@ class SettingsStore {
         // If you want a default value to be translated, add the translation to settings in locale-xx.js
         // and use an object {translate: key} in the defaults array
         let apiServer = [
-            {url: "wss://node.testnet.bitshares.eu/ws", location: "Public Testnet Server (Frankfurt, Germany)"}
+            {url: "wss://node.testnet.bitshares.eu", location: "Public Testnet Server (Frankfurt, Germany)"}
         ];
 
         let defaults = {
@@ -66,7 +66,7 @@ class SettingsStore {
                 "ru"
             ],
             apiServer: [
-                "wss://testnet.bitshares.eu/ws",
+                "wss://node.testnet.bitshares.eu",
             ],
             unit: [
                 CORE_ASSET,
@@ -113,7 +113,6 @@ class SettingsStore {
 
         this.marketsString = "markets";
         this.starredMarkets = Immutable.Map(ss.get(this.marketsString, defaultMarkets));
-
         this.starredAccounts = Immutable.Map(ss.get("starredAccounts"));
 
         let savedDefaults = ss.get("defaults_v1", {});
@@ -266,14 +265,14 @@ class SettingsStore {
         }
     }
 
-    onClearSettings() {
+    onClearSettings(resolve) {
         ss.remove("settings_v3");
         this.settings = this.defaultSettings;
 
         ss.set("settings_v3", this.settings.toJS());
 
-        if (window && window.location) {
-            // window.location.reload();
+        if (resolve) {
+            resolve();
         }
     }
 

@@ -1,5 +1,5 @@
-var alt = require("alt-instance");
-import {Apis} from "graphenejs-ws";
+import alt from "alt-instance";
+import {Apis} from "bitsharesjs-ws";
 
 let latestBlocks = {};
 

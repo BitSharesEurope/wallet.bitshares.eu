@@ -5,7 +5,7 @@ import Operation from "../Blockchain/Operation";
 import ChainTypes from "../Utility/ChainTypes";
 import BindToChainState from "../Utility/BindToChainState";
 import utils from "common/utils";
-import {ChainTypes as grapheneChainTypes} from "graphenejs-lib/es";
+import {ChainTypes as grapheneChainTypes} from "bitsharesjs/es";
 import TransitionWrapper from "../Utility/TransitionWrapper";
 import ps from "perfect-scrollbar";
 import counterpart from "counterpart";
@@ -289,7 +289,7 @@ class RecentTransactions extends React.Component {
                 </div>
                 {this.props.showMore && historyCount > this.props.limit || 20 && limit < historyCount ? (
                     <div className="account-info more-button">
-                        <button className="button outline" onClick={this._onIncreaseLimit.bind(this)}>
+                        <button className="button outline small" onClick={this._onIncreaseLimit.bind(this)}>
                             <Translate content="account.more" />
                         </button>
                     </div>

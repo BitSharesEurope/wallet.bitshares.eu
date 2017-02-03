@@ -1,6 +1,6 @@
 import React, {PropTypes, Component} from "react";
 import cname from "classnames";
-import {hash, key} from "graphenejs-lib/es";
+import {hash, key} from "bitsharesjs/es";
 
 var dictionary_set;
 
@@ -19,18 +19,19 @@ export default class BrainkeyInput extends Component {
         this.state = {
             brnkey: "",
             loading: true
-        }
+        };
     }
 
     componentWillMount() {
         if (!__ELECTRON__) {
-            fetch("/dictionary.json").then( (reply) => {
+            fetch(`${__BASE_URL__}/dictionary.json`).then( (reply) => {
                 return reply.json().then(result => {
-                    dictionary_set = new Set(result.en.split(','));
+                    dictionary_set = new Set(result.en.split(","));
                     this.setState({
                         loading: false
                     });
-            })})
+                });
+            })
             .catch(err => {
                 console.log("fetch dictionary error:", err);
             });
