@@ -3,7 +3,7 @@ import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 import Translate from "react-translate-component";
 import { ChartCanvas, Chart, series, scale, coordinates, tooltip, axes,
-    indicator, helper, interactive } from "react-stockcharts";
+    indicator, helper, interactive } from "react-stockcharts/es";
 
 const { CandlestickSeries, BarSeries, LineSeries, AreaSeries, BollingerSeries,
      MACDSeries } = series;
@@ -308,7 +308,6 @@ class CandleStickChartWithZoomPan extends React.Component {
         const { timeFormatter, enableFib, enableTrendLine, margin, calculators } = this.state;
         const themeColors = colors[theme];
         const { axisLineColor, indicatorLineColor} = themeColors;
-
         let chartMultiplier = showVolumeChart ? 1 : 0; // Used to adjust the height of the charts and their positioning
         // if (indicators.bb) calc.push(bb);
 
@@ -394,9 +393,17 @@ export default class Wrapper extends React.Component {
             !utils.are_equal_shallow(np.indicatorSettings, this.props.indicatorSettings) ||
             !utils.are_equal_shallow(np.tools, this.props.tools) ||
             np.height !== this.props.height ||
+            np.width !== this.props.width ||
+            np.leftOrderBook !== this.props.leftOrderBook ||
             np.zoom !== this.props.zoom ||
             np.showVolumeChart !== this.props.showVolumeChart
         );
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.leftOrderBook !== this.props.leftOrderBook) {
+            if (this.refs.FitWidth) this.refs.FitWidth.handleWindowResize();
+        }
     }
 
     render() {
@@ -411,7 +418,7 @@ export default class Wrapper extends React.Component {
         }
 
         return (
-            <CandleStickChartWithZoomPan {...this.props} />
+            <CandleStickChartWithZoomPan ref="FitWidth" {...this.props} />
         );
     }
 }

@@ -134,11 +134,6 @@ form.order-form {
   border-bottom: none !important;
 }
 
-.orderbook-latest-price {
-    cursor: help;
-}
-
-
 .left-orderbook-header {
   width: 100%;
   font-size: 0.75rem;
@@ -149,6 +144,12 @@ form.order-form {
 }
 .bottom-header {
   padding-top: 0.25rem;
+  > .horizontal-button {
+      height: 100%;
+      width: 100%;
+      border-bottom: none !important;
+      border-right: none !important;
+  }
 }
 
 tr.top-header, tr.bottom-header, tr.spread-row {
@@ -259,6 +260,7 @@ div.bucket-option {
   border-radius: 0;
   padding-top: 3px;
   padding-bottom: 3px;
+  user-select: none;
 }
 
 .active-bucket {

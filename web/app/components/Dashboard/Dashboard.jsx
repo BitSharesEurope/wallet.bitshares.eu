@@ -5,35 +5,45 @@ import { RecentTransactions } from "../Account/RecentTransactions";
 import Translate from "react-translate-component";
 import MarketCard from "./MarketCard";
 import utils from "common/utils";
-// import { Apis } from "bitsharesjs-ws";
+import { Apis } from "bitsharesjs-ws";
+var logo = require("assets/logo-ico-blue.png");
+import LoadingIndicator from "../LoadingIndicator";
 
 class Dashboard extends React.Component {
 
     constructor() {
         super();
+        let marketsByChain = {
+            "4018d784":[
+                ["BTS", "CNY"],
+                ["OPEN.BTC", "CNY", false],
+                ["CNY", "USD"],
+                ["OPEN.BTC", "BTS", false],
+                ["USD", "OPEN.BTC"],
+                ["USD", "OPEN.USDT"],
+                ["BTS", "USD"],
+                ["BTS", "GOLD"],
+                ["BTS", "BLOCKPAY"],
+                ["BTS", "OBITS"],
+                ["BTS", "SILVER"],
+                ["OPEN.BTC", "OPEN.DGD", false],
+                ["BTS", "BTWTY"],
+                [ "BTS", "OPEN.ETH"],
+                ["BTS", "ICOO"],
+                ["OPEN.BTC", "OPEN.STEEM"]
+            ],
+            "39f5e2ed": [
+                ["TEST", "PEG.FAKEUSD"],
+                ["TEST", "BTWTY"]
+            ]
+        };
+        let chainID = Apis.instance().chain_id;
+        if (chainID) chainID = chainID.substr(0, 8);
+
         this.state = {
             width: null,
             showIgnored: false,
-            featuredMarkets: [
-                ["BTS", "CNY"],
-                ["OPEN.BTC", "BTS", false],
-                ["OPEN.BTC", "OPEN.STEEM"],
-                ["BTS", "ICOO"],
-                ["BTS", "BLOCKPAY"],
-                ["BTS", "OBITS"],
-                ["BTS", "USD"],
-                ["BTS", "GOLD"],
-                ["BTS", "SILVER"],
-                ["USD", "OPEN.BTC"],
-                ["OPEN.BTC", "OPEN.DGD", false],
-                ["BTS", "BTWTY"],
-                ["USD", "OPEN.USDT"],
-                ["OPEN.BTC", "OPEN.INCNT"],
-                [ "BTS", "OPEN.ETH"],
-                ["CNY", "USD"]
-                // ["BTS", "SILVER"]
-                // ["BTS", "EUR"]
-            ],
+            featuredMarkets: marketsByChain[chainID] || marketsByChain["4018d784"],
             newAssets: [
 
             ]
@@ -71,6 +81,7 @@ class Dashboard extends React.Component {
             nextProps.linkedAccounts !== this.props.linkedAccounts ||
             nextProps.ignoredAccounts !== this.props.ignoredAccounts ||
             nextState.width !== this.state.width ||
+            nextProps.accountsReady !== this.props.accountsReady ||
             nextState.showIgnored !== this.state.showIgnored
         );
     }
@@ -94,18 +105,21 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        let {linkedAccounts, myIgnoredAccounts} = this.props;
+        let { linkedAccounts, myIgnoredAccounts, accountsReady } = this.props;
         let {width, showIgnored, featuredMarkets, newAssets} = this.state;
-
         let names = linkedAccounts.toArray().sort();
         let ignored = myIgnoredAccounts.toArray().sort();
 
         let accountCount = linkedAccounts.size + myIgnoredAccounts.size;
 
+        if (!accountsReady) {
+            return <LoadingIndicator />;
+        }
+
         let markets = featuredMarkets.map((pair, index) => {
 
             let className = "";
-            if (index > 3) {
+            if (index > 5) {
                 className += "show-for-medium";
             }
             if (index > 8) {
@@ -124,11 +138,40 @@ class Dashboard extends React.Component {
             );
         });
 
+        if (!accountCount) {
+            return (
+                <div ref="wrapper" className="grid-block page-layout vertical">
+                    <div ref="container" className="grid-block vertical medium-horizontal"  style={{padding: "25px 10px 0 10px"}}>
+                        <div className="grid-block vertical small-12 medium-5">
+                            <div className="Dashboard__intro-text">
+                                <h4><img style={{position: "relative", top: -15, margin: 0}} src={logo}/><Translate content="account.intro_text_title" /></h4>
+
+                                <Translate unsafe content="account.intro_text_1" component="p" />
+                                <Translate unsafe content="account.intro_text_2" component="p" />
+                                <Translate unsafe content="account.intro_text_3" component="p" />
+                                <Translate content="account.intro_text_4" component="p" />
+
+                                <div className="button create-account" onClick={() => {this.props.router.push("create-account");}}>
+                                    <Translate content="header.create_account" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid-container small-12 medium-7" style={{paddingTop: 44}}>
+                            <Translate content="exchange.featured" component="h4" style={{paddingLeft: 30}}/>
+                            <div className="grid-block small-up-2 medium-up-3 large-up-4 no-overflow">
+                                {markets}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div ref="wrapper" className="grid-block page-layout vertical">
                 <div ref="container" className="grid-container" style={{padding: "25px 10px 0 10px"}}>
                     <Translate content="exchange.featured" component="h4" />
-                    <div className="grid-block small-up-1 medium-up-3 large-up-4 no-overflow">
+                    <div className="grid-block small-up-2 medium-up-3 large-up-4 no-overflow">
                         {markets}
                     </div>
 
@@ -158,7 +201,8 @@ class Dashboard extends React.Component {
                     /> : null}
 
                 </div>
-            </div>);
+            </div>
+        );
     }
 }
 
