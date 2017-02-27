@@ -1,3 +1,3 @@
-cd testnet.bitshares.eu/web
+cd wallet.bitshares.eu/web
 npm run-script build
 cd ../../
