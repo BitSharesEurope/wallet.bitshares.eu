@@ -8,7 +8,7 @@ import { Apis } from "bitsharesjs-ws";
 
 const CORE_ASSET = "BTS"; // Setting this to BTS to prevent loading issues when used with BTS chain which is the most usual case currently
 
-const STORAGE_KEY = "__graphene__";
+const STORAGE_KEY = "__bitshareseu__";
 let ss = new ls(STORAGE_KEY);
 
 class SettingsStore {
@@ -17,8 +17,8 @@ class SettingsStore {
         this.initDone = false;
         this.defaultSettings = Immutable.Map({
             locale: "en",
-            apiServer: "wss://bitshares.openledger.info/ws",
-            faucet_address: "https://bitshares.openledger.info",
+            apiServer: "wss://node.bitshares.eu",
+            faucet_address: "https://faucet.bitshares.eu",
             unit: CORE_ASSET,
             showSettles: false,
             showAssetPercent: false,
@@ -30,6 +30,7 @@ class SettingsStore {
         // If you want a default value to be translated, add the translation to settings in locale-xx.js
         // and use an object {translate: key} in the defaults array
         let apiServer = [
+            {url: "wss://node.bitshares.eu", location: "Nuremberg, Germany"},
             {url: "wss://bitshares.openledger.info/ws", location: "Nuremberg, Germany"},
             {url: "wss://bit.btsabc.org/ws", location: "Hong Kong"},
             {url: "wss://bts.transwiser.com/ws", location: "Hangzhou, China"},

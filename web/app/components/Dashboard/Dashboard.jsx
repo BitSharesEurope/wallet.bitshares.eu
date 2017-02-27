@@ -8,6 +8,9 @@ import utils from "common/utils";
 import { Apis } from "bitsharesjs-ws";
 var logo = require("assets/logo-ico-blue.png");
 import LoadingIndicator from "../LoadingIndicator";
+import SettingsStore from "stores/SettingsStore";
+import SettingsActions from "actions/SettingsActions";
+
 
 class Dashboard extends React.Component {
 
@@ -46,7 +49,8 @@ class Dashboard extends React.Component {
             featuredMarkets: marketsByChain[chainID] || marketsByChain["4018d784"],
             newAssets: [
 
-            ]
+            ],
+            removeBackupWarning: SettingsStore.getState().settings.get("removeBackupWarning", false)
         };
 
         this._setDimensions = this._setDimensions.bind(this);
@@ -88,6 +92,15 @@ class Dashboard extends React.Component {
 
     componentWillUnmount() {
         window.removeEventListener("resize", this._setDimensions, false);
+    }
+
+    _onCloseWarning() {
+        let newVal = !this.state.removeBackupWarning
+        this.setState({
+            removeBackupWarning: newVal
+        });
+        SettingsActions.changeSetting({setting: "removeBackupWarning", value: newVal });
+        this.forceUpdate(); // Not sure why this is needed
     }
 
     _setDimensions() {
@@ -167,8 +180,30 @@ class Dashboard extends React.Component {
             );
         }
 
+        let warning = (!this.state.removeBackupWarning) ?
+                <div className="grid-container">
+                    <div className="grid-block no-overflow">
+                        <div className="callout warning">
+                          <Translate content="dashboard.warning_title" component="h4" />
+                          <Translate content="dashboard.warning_text" component="p" />
+                          <div className="button success" onClick={() => {this.props.router.push("/wallet/backup/create");}}>
+                           <Translate content="settings.backup_text" />
+                          </div>
+                          <div className="button success" onClick={() => {this.props.router.push("/wallet/backup/restore");}}>
+                           <Translate content="settings.restore" />
+                          </div>
+                          <button className={"button outline"} type="button"
+                                  onClick={this._onCloseWarning.bind(this)}>
+                                  Understood!
+                          </button>
+                        </div>
+                    </div>
+                </div>
+               : null;
+
         return (
             <div ref="wrapper" className="grid-block page-layout vertical">
+                {warning}
                 <div ref="container" className="grid-container" style={{padding: "25px 10px 0 10px"}}>
                     <Translate content="exchange.featured" component="h4" />
                     <div className="grid-block small-up-2 medium-up-3 large-up-4 no-overflow">

@@ -31,3 +31,30 @@ div.fm-container {
         border-bottom: 1px solid grey;
     }
 }
+
+.callout {
+    margin: 1rem 0 1rem 0;
+    padding: 1rem;
+    position: relative;
+    color: black;
+    background-color: white;
+}
+.callout.alert {
+    background-color: #fce6e2;
+}
+.callout.warning {
+    background-color: #fff3d9;
+}
+.callout.success {
+    background-color: #e1faea;
+}
+.callout.primary {
+    background-color: #def0fc;
+}
+.callout.secondary {
+    background-color: #ebebeb;
+}
+.callout h4 {
+ color: black !important;
+ font-weight: 800;
+}
