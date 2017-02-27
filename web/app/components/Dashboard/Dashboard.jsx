@@ -16,7 +16,7 @@ class Dashboard extends React.Component {
         let marketsByChain = {
             "4018d784":[
                 ["BTS", "CNY"],
-                ["OPEN.BTC", "CNY", false],
+                ["CNY", "OPEN.BTC"],
                 ["CNY", "USD"],
                 ["OPEN.BTC", "BTS", false],
                 ["USD", "OPEN.BTC"],
@@ -149,7 +149,7 @@ class Dashboard extends React.Component {
                                 <Translate unsafe content="account.intro_text_1" component="p" />
                                 <Translate unsafe content="account.intro_text_2" component="p" />
                                 <Translate unsafe content="account.intro_text_3" component="p" />
-                                <Translate content="account.intro_text_4" component="p" />
+                                <Translate unsafe content="account.intro_text_4" component="p" />
 
                                 <div className="button create-account" onClick={() => {this.props.router.push("create-account");}}>
                                     <Translate content="header.create_account" />
