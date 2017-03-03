@@ -5,6 +5,7 @@ import Immutable from "immutable";
 import {merge} from "lodash";
 import ls from "common/localStorage";
 import { Apis } from "bitsharesjs-ws";
+import { settingsAPIs } from "api/apiConfig";
 
 const CORE_ASSET = "BTS"; // Setting this to BTS to prevent loading issues when used with BTS chain which is the most usual case currently
 
@@ -17,8 +18,8 @@ class SettingsStore {
         this.initDone = false;
         this.defaultSettings = Immutable.Map({
             locale: "en",
-            apiServer: "wss://node.bitshares.eu",
-            faucet_address: "https://faucet.bitshares.eu",
+            apiServer: settingsAPIs.DEFAULT_WS_NODE,
+            faucet_address: settingsAPIs.DEFAULT_FAUCET,
             unit: CORE_ASSET,
             showSettles: false,
             showAssetPercent: false,
@@ -29,16 +30,7 @@ class SettingsStore {
 
         // If you want a default value to be translated, add the translation to settings in locale-xx.js
         // and use an object {translate: key} in the defaults array
-        let apiServer = [
-            {url: "wss://node.bitshares.eu", location: "Nuremberg, Germany"},
-            {url: "wss://bitshares.openledger.info/ws", location: "Nuremberg, Germany"},
-            {url: "wss://bit.btsabc.org/ws", location: "Hong Kong"},
-            {url: "wss://bts.transwiser.com/ws", location: "Hangzhou, China"},
-            {url: "wss://bitshares.dacplay.org:8089/ws", location:  "Hangzhou, China"},
-            {url: "wss://openledger.hk/ws", location: "Hong Kong"},
-            {url: "wss://secure.freedomledger.com/ws", location: "Toronto, Canada"},
-            {url: "wss://testnet.bitshares.eu/ws", location: "Public Testnet Server (Frankfurt, Germany)"}
-        ];
+        let apiServer = settingsAPIs.WS_NODE_LIST;
 
         let defaults = {
             locale: [
@@ -152,6 +144,8 @@ class SettingsStore {
         this.marketDirections = Immutable.Map(ss.get("marketDirections"));
 
         this.hiddenAssets = Immutable.List(ss.get("hiddenAssets", []));
+
+        this.apiLatencies = ss.get("apiLatencies", {});
     }
 
     init() {
