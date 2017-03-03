@@ -5,7 +5,7 @@ export const blockTradesAPIs = {
 };
 
 export const settingsAPIs = {
-    DEFAULT_WS_NODE: "wss://bitshares.openledger.info/ws",
+    DEFAULT_WS_NODE: "wss://node.bitshares.eu",
     WS_NODE_LIST: [
         {url: "wss://bitshares.openledger.info/ws", location: "Nuremberg, Germany"},
         {url: "wss://eu.openledger.info/ws", location: "Berlin, Germany"},
@@ -16,6 +16,6 @@ export const settingsAPIs = {
         {url: "wss://secure.freedomledger.com/ws", location: "Toronto, Canada"},
         {url: "wss://testnet.bitshares.eu/ws", location: "Public Testnet Server (Frankfurt, Germany)"}
     ],
-    DEFAULT_FAUCET: "https://bitshares.openledger.info",
+    DEFAULT_FAUCET: "https://faucet.bitshares.eu",
     RPC_URL: "https://openledger.info/api/"
 };
