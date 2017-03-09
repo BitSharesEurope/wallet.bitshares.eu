@@ -298,7 +298,7 @@ class DepositWithdrawContent extends React.Component {
         // }
         return (
             <div className={!addressValue ? "no-overflow" : ""}>
-                <p><Translate content="gateway.add_funds" /></p>
+                <p><Translate unsafe content="gateway.add_funds" account={this.props.sender.get("name")} /></p>
 
                 {this._renderCurrentBalance()}
 
@@ -344,7 +344,7 @@ class DepositWithdrawContent extends React.Component {
     _renderCurrentBalance() {
         const {name: assetName} = utils.replaceName(this.props.asset.get("symbol"), !!this.props.asset.get("bitasset"));
         const isDeposit = this.props.action === "deposit";
-        
+
         let currentBalance = this.props.balances.find(b => {
             return b && b.get("asset_type") === this.props.asset.get("id");
         });
@@ -401,7 +401,7 @@ class DepositWithdrawContent extends React.Component {
             return null;
         }
 
-        const {replaceName:assetName} = utils.replaceName(asset.get("symbol"), true);
+        const {name: assetName} = utils.replaceName(asset.get("symbol"), true);
 
         return (
             <div className="SimpleTrade__modal">

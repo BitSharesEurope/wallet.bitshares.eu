@@ -346,6 +346,7 @@ select {
 }
 
 select.bts-select {
+    border-radius: 5px;
     cursor:pointer;
     border: none;
     background: none;
@@ -356,6 +357,12 @@ select.bts-select {
     -moz-appearance: menulist;
     appearance: menulist;
     height: inherit;
+}
+
+@media screen and (min-width: 900px) {
+    .column-show-small {
+        display: none !important;
+    }
 }
 
 @media screen and (max-width: 600px) {
@@ -385,18 +392,12 @@ select.bts-select {
   }
 }
 
-input[type=number] {
-    -moz-appearance:textfield;
+input, textarea {
+    border-radius: 5px !important;
 }
 
-.account-drop-down {
-  a.button {
-    background-color: transparent;
-    text-transform: none;
-  }
-  a:active.button, a:hover.button {
-    background-color: transparent !important;
-  }
+input[type=number] {
+    -moz-appearance:textfield;
 }
 
 .clickable {

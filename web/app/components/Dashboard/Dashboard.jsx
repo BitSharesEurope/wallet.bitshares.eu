@@ -29,17 +29,19 @@ class Dashboard extends React.Component {
                 ["BTS", "BLOCKPAY"],
                 ["OPEN.BTC", "BLOCKPAY", false],
                 ["BTS", "OBITS"],
-                ["OPEN.BTC", "KAPITAL"],
+                ["KAPITAL", "OPEN.BTC", false],
                 ["BTS", "SILVER"],
                 ["OPEN.BTC", "OPEN.DGD", false],
                 ["BTS", "BTWTY"],
-                [ "BTS", "OPEN.ETH"],
+                ["BTS", "OPEN.ETH"],
                 ["BTS", "ICOO"],
                 ["OPEN.BTC", "OPEN.STEEM"],
                 ["OPEN.USDT", "OPEN.BTC", false],
                 ["BTS", "OPEN.STEEM"],
+                ["OPEN.BTC", "ICOO"],
                 ["OPEN.BTC", "OPEN.MAID"],
                 ["BTS", "OPEN.MAID"],
+                ["OPEN.BTC", "OBITS", false],
                 ["HEMPSWEET", "OPEN.BTC"]
             ],
             "39f5e2ed": [
@@ -168,7 +170,7 @@ class Dashboard extends React.Component {
                         </div>
                         <div className="grid-container small-12 medium-7" style={{paddingTop: 44}}>
                             <Translate content="exchange.featured" component="h4" style={{paddingLeft: 30}}/>
-                            <div className="grid-block small-up-2 medium-up-3 large-up-4 no-overflow">
+                            <div className="grid-block small-up-2 medium-up-3 large-up-4 no-overflow fm-outer-container">
                                 {markets}
                             </div>
                         </div>
@@ -203,7 +205,7 @@ class Dashboard extends React.Component {
                 {warning}
                 <div ref="container" className="grid-container" style={{padding: "25px 10px 0 10px"}}>
                     <Translate content="exchange.featured" component="h4" />
-                    <div className="grid-block small-up-2 medium-up-3 large-up-4 no-overflow">
+                    <div className="grid-block small-up-2 medium-up-3 large-up-4 no-overflow fm-outer-container">
                         {markets}
                     </div>
 

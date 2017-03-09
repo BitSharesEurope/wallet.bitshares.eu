@@ -73,10 +73,6 @@ class Header extends React.Component {
         );
     }
 
-    componentWillReceiveProps(nextProps) {
-        // this._setActivePath();
-    }
-
     _triggerMenu(e) {
         e.preventDefault();
         ZfApi.publish("mobile-menu", "toggle");
@@ -107,6 +103,7 @@ class Header extends React.Component {
         e.preventDefault();
         ZfApi.publish("account_drop_down", "close");
         AccountActions.setCurrentAccount.defer(account_name);
+        this.onClickUser(account_name, e);
     }
 
     onClickUser(account, e) {
@@ -139,24 +136,20 @@ class Header extends React.Component {
             });
         }
 
-
         let myAccounts = AccountStore.getMyAccounts();
 
         let walletBalance = myAccounts.length ? (
-                            <div className="grp-menu-item" style={{
-                                padding: "18px 0 15px 0",
-                                fontSize: 14
-                            }} >
-                                <TotalBalanceValue.AccountWrapper accounts={myAccounts} inHeader={true}/>
+                            <div className="grp-menu-item header-balance">
+                                <a><TotalBalanceValue.AccountWrapper label="exchange.balance" accounts={myAccounts} inHeader={true}/></a>
                             </div>) : null;
 
         let dashboard = (
             <a
-                style={{paddingTop: 3, paddingBottom: 3}}
+                style={{paddingTop: 12, paddingBottom: 12}}
                 className={cnames({active: active === "/" || active.indexOf("dashboard") !== -1})}
                 onClick={this._onNavigate.bind(this, "/dashboard")}
             >
-                <img style={{margin: 0, height: 40}} src={logo}/>
+                <img style={{margin: 0, height: 40}} src={logo} />
             </a>
         );
 
@@ -173,7 +166,7 @@ class Header extends React.Component {
             <div className="grp-menu-item" >
             { this.props.locked ?
                 <a style={{padding: "1rem"}} href onClick={this._toggleLock.bind(this)} data-class="unlock-tooltip" data-offset="{'left': 50}" data-tip={locked_tip} data-place="bottom" data-html><Icon className="icon-14px" name="locked"/></a>
-                : <a href onClick={this._toggleLock.bind(this)} data-class="unlock-tooltip" data-offset="{'left': 50}" data-tip={unlocked_tip} data-place="bottom" data-html><Icon className="icon-14px" name="unlocked"/></a> }
+                : <a style={{padding: "1rem"}} href onClick={this._toggleLock.bind(this)} data-class="unlock-tooltip" data-offset="{'left': 50}" data-tip={unlocked_tip} data-place="bottom" data-html><Icon className="icon-14px" name="unlocked"/></a> }
             </div>
         ) : null;
 
@@ -192,54 +185,59 @@ class Header extends React.Component {
             }
 
             if (tradingAccounts.length >= 1) {
-
                 let accountsList = tradingAccounts
                     .sort()
                     .map((name, index) => {
                         return (
-                            <li key={name} style={index === 0 ? {paddingTop: 10} : null}>
+                            <li className={name === account_display_name ? "current-account" : ""} key={name}>
                                 <a href onClick={this._accountClickHandler.bind(this, name)}>
-                                    <span className="float-left">
-                                        <Icon className="icon-14px" name="user"/>
-                                    </span>
                                     <span>{name}</span>
                                 </a>
                             </li>
                         );
                     });
 
-                let options = [
-                    {to: "/help", text: "header.help"},
-                    {to: "/explorer", text: "header.explorer"}
-                ].map(entry => {
-                    return <li className="dropdown-options" key={entry.to}><Translate content={entry.text} component="a" onClick={this._onNavigate.bind(this, entry.to)}/></li>;
-                });
+                // let optionsEntries = [
+                //     {to: "/help", text: "header.help"},
+                //     {to: "/explorer", text: "header.explorer"}
+                // ];
+                //
+                // let options = optionsEntries.map((entry, index) => {
+                //     return <li className={"dropdown-options" + (index === optionsEntries.length - 1 ? " dropdown-divider" : "")} key={entry.to}>
+                //         <Translate content={entry.text} component="a" onClick={this._onNavigate.bind(this, entry.to)}/>
+                //     </li>;
+                // });
 
-                let lockOptions = (this.props.current_wallet && myAccountCount) ? (
-                    <li className="dropdown-options">
-                        <Translate
-                            content={ this.props.locked ? "header.unlock" : "header.lock"}
-                            component="a"
-                            onClick={this._toggleLock.bind(this)}
-                        />
-                    </li>) : null;
+                // let lockOptions = (this.props.current_wallet && myAccountCount) ? (
+                //     <li className="dropdown-options">
+                //         <Translate
+                //             content={ this.props.locked ? "header.unlock" : "header.lock"}
+                //             component="a"
+                //             onClick={this._toggleLock.bind(this)}
+                //         />
+                //     </li>) : null;
 
 
-                accountsDropDown = (
+                accountsDropDown = tradingAccounts.length === 1 ?
+                (<ActionSheet.Button title="">
+                    <a onClick={this._accountClickHandler.bind(this, account_display_name)} style={{padding: "1rem", border: "none"}} className="button">
+                        <Icon className="icon-14px" name="user"/> {account_display_name}
+                    </a>
+                </ActionSheet.Button>) :
+
+                (
                     <ActionSheet>
                         <ActionSheet.Button title="">
                             <a style={{padding: "1rem", border: "none"}} className="button">
-                                &nbsp;{account_display_name} &nbsp;
-                                <Icon className="icon-14px" name="chevron-down"/>
+                                <Icon className="icon-14px" name="user"/> {account_display_name}
                             </a>
                         </ActionSheet.Button>
-                        <ActionSheet.Content >
+                        {tradingAccounts.length > 1 ?
+                        <ActionSheet.Content>
                             <ul className="no-first-element-top-border">
-                                {options}
-                                {lockOptions}
-                                {tradingAccounts.length > 1 ? accountsList : null}
+                                 {accountsList}
                             </ul>
-                        </ActionSheet.Content>
+                        </ActionSheet.Content> : null}
                     </ActionSheet>);
             }
         }
@@ -250,7 +248,7 @@ class Header extends React.Component {
             <div className="header menu-group primary">
                 <div className="show-for-small-only">
                     <ul className="primary menu-bar title">
-                        <li><a href onClick={this._triggerMenu}><Icon className="icon-14px" name="menu"/></a></li>
+                        <li><a href onClick={this._triggerMenu}><Icon className="icon-32px" name="menu"/></a></li>
                     </ul>
                 </div>
                 {__ELECTRON__ ? <div className="grid-block show-for-medium shrink">
@@ -281,11 +279,11 @@ class Header extends React.Component {
                     <div className="grp-menu-items-group header-right-menu">
                         {walletBalance}
 
-                        <div className="grid-block shrink overflow-visible account-drop-down">
+                        <div className="grp-menu-item overflow-visible account-drop-down">
                             {accountsDropDown}
                         </div>
                         <div className="grp-menu-item" >
-                            <Link style={{padding: "1rem"}} to="/settings" data-tip={settings} data-place="bottom"><Icon className="icon-14px" name="cog"/></Link>
+                            <Link className={cnames({active: active.indexOf("settings") !== -1})} style={{padding: "1rem"}} to="/settings" data-tip={settings} data-place="bottom"><Icon className="icon-14px" name="cog"/></Link>
                         </div>
                         {lock_unlock}
                         {createAccountLink}
