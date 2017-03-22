@@ -12,6 +12,7 @@ import TransactionConfirmStore from "stores/TransactionConfirmStore";
 import { RecentTransactions } from "../Account/RecentTransactions";
 import Immutable from "immutable";
 import {ChainStore} from "bitsharesjs/es";
+import {connect} from "alt-react";
 
 class Transfer extends React.Component {
 
@@ -69,6 +70,15 @@ class Transfer extends React.Component {
             this.onAmountChanged({amount: ns.amount, asset: ChainStore.getAsset(asset_types[0])});
         }
         return true;
+    }
+
+    componentWillReceiveProps(np) {
+        if (np.currentAccount !== this.state.from_name && np.currentAccount !== this.props.currentAccount) {
+            this.setState({
+                from_name: np.currentAccount,
+                from_account: ChainStore.getAccount(np.currentAccount)
+            });
+        }
     }
 
     fromChanged(from_name) {
@@ -190,6 +200,16 @@ class Transfer extends React.Component {
         return {asset_types, fee_asset_types};
     }
 
+    _onAccountDropdown(account) {
+        let newAccount = ChainStore.getAccount(account);
+        if (newAccount) {
+            this.setState({
+                from_name: account,
+                from_account: ChainStore.getAccount(account)
+            });
+        }
+    }
+
     render() {
         let from_error = null;
         let {propose, from_account, to_account, asset, asset_id, propose_account,
@@ -272,6 +292,8 @@ class Transfer extends React.Component {
                                 size={60}
                                 error={from_error}
                                 tabIndex={tabIndex++}
+                                onDropdownSelect={this._onAccountDropdown.bind(this)}
+                                dropDownContent={AccountStore.getMyAccounts()}
                             />
                         </div>
                         {/*  T O  */}
@@ -384,4 +406,13 @@ class Transfer extends React.Component {
     }
 }
 
-export default Transfer;
+export default connect(Transfer, {
+    listenTo() {
+        return [AccountStore];
+    },
+    getProps() {
+        return {
+            currentAccount: AccountStore.getState().currentAccount
+        };
+    }
+});
