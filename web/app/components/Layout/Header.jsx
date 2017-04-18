@@ -89,8 +89,13 @@ class Header extends React.Component {
 
     _toggleLock(e) {
         e.preventDefault();
-        if (WalletDb.isLocked()) WalletUnlockActions.unlock();
-        else WalletUnlockActions.lock();
+        if (WalletDb.isLocked()) {
+            WalletUnlockActions.unlock().then(() => {
+                AccountActions.tryToSetCurrentAccount();
+            });
+        } else {
+            WalletUnlockActions.lock();
+        }
     }
 
     _onNavigate(route, e) {
@@ -366,7 +371,7 @@ export default connect(Header, {
         const chainID = Apis.instance().chain_id;
         return {
             linkedAccounts: AccountStore.getState().linkedAccounts,
-            currentAccount: AccountStore.getState().currentAccount,
+            currentAccount: AccountStore.getState().currentAccount || AccountStore.getState().passwordAccount,
             locked: WalletUnlockStore.getState().locked,
             current_wallet: WalletManagerStore.getState().current_wallet,
             lastMarket: SettingsStore.getState().viewSettings.get(`lastMarket${chainID ? ("_" + chainID.substr(0, 8)) : ""}`),
