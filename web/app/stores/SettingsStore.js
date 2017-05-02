@@ -42,8 +42,8 @@ class SettingsStore {
             showAssetPercent: false,
             walletLockTimeout: 60 * 10,
             themes: "darkTheme",
-            disableChat: false,
-            passwordLogin: false
+            disableChat: true,
+            passwordLogin: true,
         });
 
         // If you want a default value to be translated, add the translation to settings in locale-xx.js
