@@ -7,6 +7,8 @@ let inProgress = {};
 class GatewayActions {
 
     fetchCoins({backer = "OPEN", url = undefined} = {}) {
+        return {};
+        /*
         if (!inProgress["fetchCoins_" + backer]) {
             inProgress["fetchCoins_" + backer] = true;
             return (dispatch) => {
@@ -29,9 +31,12 @@ class GatewayActions {
         } else {
             return {};
         }
+        */
     }
 
     fetchBridgeCoins(url = undefined) {
+        return {};
+        /*
         if (!inProgress["fetchBridgeCoins"]) {
             inProgress["fetchBridgeCoins"] = true;
             return (dispatch) => {
@@ -52,6 +57,7 @@ class GatewayActions {
         } else {
             return {};
         }
+       */
     }
 }
 

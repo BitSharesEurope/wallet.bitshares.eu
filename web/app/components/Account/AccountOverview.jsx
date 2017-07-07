@@ -44,12 +44,10 @@ class AccountOverview extends React.Component {
                 "BTS",
                 "USD",
                 "CNY",
-                "OPEN.BTC",
-                "OPEN.USDT",
-                "OPEN.ETH",
-                "OPEN.MAID",
-                "OPEN.STEEM",
-                "OPEN.DASH"
+                "HERO",
+                "BTC",
+                "SILVER",
+                "GOLD"
             ]
         };
     }
@@ -135,7 +133,7 @@ class AccountOverview extends React.Component {
             const notCore = asset.get("id") !== "1.3.0";
             let {market} = assetUtils.parseDescription(asset.getIn(["options", "description"]));
             symbol = asset.get("symbol");
-            if (symbol.indexOf("OPEN.") !== -1 && !market) market = "USD";
+            if (!market) market = "USD";
             let preferredMarket = market ? market : core_asset ? core_asset.get("symbol") : "BTS";
 
             /* Table content */
@@ -174,7 +172,7 @@ class AccountOverview extends React.Component {
             const includeAsset = !hiddenAssets.includes(asset_type);
             const hasBalance = !!balanceObject.get("balance");
             const hasOnOrder = !!orders[asset_type];
-            const canDepositWithdraw = !!this.props.backedCoins.get("OPEN", []).find(a => a.symbol === asset.get("symbol"));
+            const canDepositWithdraw = false;  //!!this.props.backedCoins.get("OPEN", []).find(a => a.symbol === asset.get("symbol"));
             const canWithdraw = canDepositWithdraw && (hasBalance && balanceObject.get("balance") != 0);
             const canBuy = !!this.props.bridgeCoins.get(symbol);
 
@@ -256,11 +254,13 @@ class AccountOverview extends React.Component {
         if (optionalAssets) {
             optionalAssets.filter(asset => {
                 let isAvailable = false;
+                /*
                 this.props.backedCoins.get("OPEN", []).forEach(coin => {
                     if (coin && (coin.symbol === asset)) {
                         isAvailable = true;
                     }
                 });
+               */
                 if (!!this.props.bridgeCoins.get(asset)) {
                     isAvailable = true;
                 }
@@ -275,12 +275,12 @@ class AccountOverview extends React.Component {
                 if (asset && this.props.isMyAccount) {
                     const includeAsset = !hiddenAssets.includes(asset.get("id"));
 
-                    const canDepositWithdraw = !!this.props.backedCoins.get("OPEN", []).find(a => a.symbol === asset.get("symbol"));
+                    const canDepositWithdraw = false;  // !!this.props.backedCoins.get("OPEN", []).find(a => a.symbol === asset.get("symbol"));
                     const canBuy = !!this.props.bridgeCoins.get(asset.get("symbol"));
 
                     const notCore = asset.get("id") !== "1.3.0";
                     let {market} = assetUtils.parseDescription(asset.getIn(["options", "description"]));
-                    if (asset.get("symbol").indexOf("OPEN.") !== -1 && !market) market = "USD";
+                    if (!market) market = "USD";
                     let preferredMarket = market ? market : core_asset ? core_asset.get("symbol") : "BTS";
                     let directMarketLink = notCore ? <Link to={`/market/${asset.get("symbol")}_${preferredMarket}`}><Translate content="account.trade" /></Link> : null;
                     let {isBitAsset, borrowModal, borrowLink} = renderBorrow(asset, this.props.account);
@@ -418,12 +418,16 @@ class AccountOverview extends React.Component {
         let showAssetPercent = settings.get("showAssetPercent", false);
 
         // Find the current Openledger coins
+        const currentDepositAsset = {};  
+        const currentWithdrawAsset = {};
+        /*
         const currentDepositAsset = this.props.backedCoins.get("OPEN", []).find(c => {
             return c.symbol === this.state.depositAsset;
         }) || {};
         const currentWithdrawAsset = this.props.backedCoins.get("OPEN", []).find(c => {
             return c.symbol === this.state.withdrawAsset;
         }) || {};
+        */
         const currentBridges = this.props.bridgeCoins.get(this.state.bridgeAsset) || null;
 
         return (
