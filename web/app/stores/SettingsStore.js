@@ -149,7 +149,7 @@ class SettingsStore {
             let topMarkets = {
                 markets_4018d784: [ // BTS MAIN NET
                     "BTS", "BTC", "USD", "CNY", "EUR", "GOLD", "SILVER",
-                    "HERO", "RUBLE"
+                    "HERO", "RUBLE", "PPY"
                 ],
                 markets_39f5e2ed: [ // TESTNET
                     "PEG.FAKEUSD", "BTWTY"
