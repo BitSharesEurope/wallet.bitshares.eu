@@ -12,6 +12,7 @@ import TransactionConfirmStore from "stores/TransactionConfirmStore";
 import { RecentTransactions } from "../Account/RecentTransactions";
 import Immutable from "immutable";
 import {ChainStore} from "bitsharesjs/es";
+import {connect} from "alt-react";
 
 class Transfer extends React.Component {
 
@@ -65,10 +66,31 @@ class Transfer extends React.Component {
         let { asset_types: current_types } = this._getAvailableAssets();
         let { asset_types } = this._getAvailableAssets(ns);
 
-        if (asset_types.length === 1 && current_types.length !== 1) {
-            this.onAmountChanged({amount: ns.amount, asset: ChainStore.getAsset(asset_types[0])});
+        if (asset_types.length === 1) {
+            let asset = ChainStore.getAsset(asset_types[0]);
+            if (current_types.length !== 1) {
+                this.onAmountChanged({amount: ns.amount, asset});
+            }
+
+            if (asset_types[0] !== this.state.fee_asset_id) {
+                if (asset && this.state.fee_asset_id !== asset_types[0]) {
+                    this.setState({
+                        feeAsset: asset,
+                        fee_asset_id: asset_types[0]
+                    });
+                }
+            }
         }
         return true;
+    }
+
+    componentWillReceiveProps(np) {
+        if (np.currentAccount !== this.state.from_name && np.currentAccount !== this.props.currentAccount) {
+            this.setState({
+                from_name: np.currentAccount,
+                from_account: ChainStore.getAccount(np.currentAccount)
+            });
+        }
     }
 
     fromChanged(from_name) {
@@ -190,12 +212,21 @@ class Transfer extends React.Component {
         return {asset_types, fee_asset_types};
     }
 
+    _onAccountDropdown(account) {
+        let newAccount = ChainStore.getAccount(account);
+        if (newAccount) {
+            this.setState({
+                from_name: account,
+                from_account: ChainStore.getAccount(account)
+            });
+        }
+    }
+
     render() {
         let from_error = null;
         let {propose, from_account, to_account, asset, asset_id, propose_account,
             amount, error, to_name, from_name, memo, feeAsset, fee_asset_id} = this.state;
-
-        let from_my_account = AccountStore.isMyAccount(from_account);
+        let from_my_account = AccountStore.isMyAccount(from_account) || from_name === this.props.passwordAccount;
 
         if(from_account && ! from_my_account && ! propose ) {
             from_error = <span>
@@ -272,6 +303,8 @@ class Transfer extends React.Component {
                                 size={60}
                                 error={from_error}
                                 tabIndex={tabIndex++}
+                                onDropdownSelect={this._onAccountDropdown.bind(this)}
+                                dropDownContent={AccountStore.getMyAccounts()}
                             />
                         </div>
                         {/*  T O  */}
@@ -384,4 +417,14 @@ class Transfer extends React.Component {
     }
 }
 
-export default Transfer;
+export default connect(Transfer, {
+    listenTo() {
+        return [AccountStore];
+    },
+    getProps() {
+        return {
+            currentAccount: AccountStore.getState().currentAccount,
+            passwordAccount: AccountStore.getState().passwordAccount
+        };
+    }
+});

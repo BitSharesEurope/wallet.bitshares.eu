@@ -34,7 +34,7 @@ npm install
 
 ## Running the dev server
 
-The dev server uses Express in combination with Wepback 2.
+The dev server uses Express in combination with Webpack 2.
 
 Once all the packages have been installed you can start the development server by going to the `web` folder and running:
 ```
@@ -72,7 +72,7 @@ For more info, please contact one of the following people:
 - bitsharesblocks@gmail.com
 - valentine@cryptonomex.com
 
-There's also a very active [Telegram chatroom](https://web.telegram.org/#/im?p=g33416306)
+There's also a very active [Telegram chatroom](https://t.me/BitSharesDEX)
 
 ## Development process
 

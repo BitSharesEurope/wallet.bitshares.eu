@@ -6,7 +6,7 @@ import ls from "common/localStorage";
 import {ChainStore} from "bitsharesjs/es";
 import utils from "common/utils";
 import {LimitOrder, CallOrder, FeedPrice, SettleOrder, Asset,
-    didOrdersChange} from "common/MarketClasses";
+    didOrdersChange, Price} from "common/MarketClasses";
 
 // import {
 //     SettleOrder
@@ -69,6 +69,7 @@ class MarketsStore {
 
         this.allMarketStats = Immutable.Map();
         this.lowVolumeMarkets = Immutable.Map(marketStorage.get("lowVolumeMarkets", {}));
+        this.onlyStars = marketStorage.get("onlyStars", false);
 
         this.baseAsset = {
             id: "1.3.0",
@@ -94,7 +95,8 @@ class MarketsStore {
             onGetMarketStats: MarketsActions.getMarketStats,
             onSettleOrderUpdate: MarketsActions.settleOrderUpdate,
             onSwitchMarket: MarketsActions.switchMarket,
-            onFeedUpdate: MarketsActions.feedUpdate
+            onFeedUpdate: MarketsActions.feedUpdate,
+            onToggleStars: MarketsActions.toggleStars
         });
     }
 
@@ -120,6 +122,11 @@ class MarketsStore {
 
     onChangeBucketSize(size) {
         this._setBucketSize(size);
+    }
+
+    onToggleStars() {
+        this.onlyStars = !this.onlyStars;
+        marketStorage.set("onlyStars", this.onlyStars);
     }
 
     onUnSubscribeMarket(payload) {
@@ -292,9 +299,12 @@ class MarketsStore {
             this.activeMarketHistory = this.activeMarketHistory.clear();
             result.history.forEach(order => {
                 order.op.time = order.time;
-                this.activeMarketHistory = this.activeMarketHistory.add(
-                    order.op
-                );
+                /* Only include history objects that aren't 'something for nothing' to avoid confusion */
+                if (!(order.op.receives.amount == 0 || order.op.pays.amount == 0)) {
+                    this.activeMarketHistory = this.activeMarketHistory.add(
+                        order.op
+                    );
+                }
             });
         }
 
@@ -309,7 +319,7 @@ class MarketsStore {
 
         if (result.recent && result.recent.length) {
 
-            let stats = this._calcMarketStats(result.recent, this.baseAsset, this.quoteAsset);
+            let stats = this._calcMarketStats(result.recent, this.baseAsset, this.quoteAsset, result.history, this.quoteAsset.get("symbol") + "_" + this.baseAsset.get("symbol"));
 
             this.marketStats = this.marketStats.set("change", stats.change);
             this.marketStats = this.marketStats.set("volumeBase", stats.volumeBase);
@@ -347,7 +357,6 @@ class MarketsStore {
             let didUpdate = false;
             cancellations.forEach(orderID => {
                 if (orderID && this.marketLimitOrders.has(orderID)) {
-                    console.log("removed order", orderID);
                     didUpdate = true;
                     this.marketLimitOrders = this.marketLimitOrders.delete(orderID);
                 }
@@ -965,6 +974,9 @@ class MarketsStore {
             }
 
             change = noTrades ? 0 : Math.round(10000 * (close - open) / open) / 100;
+            if (!isFinite(change) || isNaN(change)) {
+                change = 0;
+            }
         }
 
         if (recent && recent.length && recent.length > 1) {
@@ -983,6 +995,15 @@ class MarketsStore {
             latestPrice = market_utils.parse_order_history(order, paysAsset, receivesAsset, isAsk, flipped).full;
         }
 
+        let price;
+
+        if (last.close_base && last.close_quote) {
+            let invert = last.key.base !== baseAsset.get("id");
+            let base = new Asset({amount: last[invert ? "close_quote" : "close_base"], asset_id: last.key[invert ? "quote" : "base"], precision: baseAsset.get("precision")});
+            let quote = new Asset({amount: last[!invert ? "close_quote" : "close_base"], asset_id: last.key[!invert ? "quote" : "base"], precision: quoteAsset.get("precision")});
+            price = new Price({base, quote});
+        }
+
         let close = last.close_base && last.close_quote ? {
             quote: {
                 amount: invert ? last.close_quote : last.close_base,
@@ -993,21 +1014,39 @@ class MarketsStore {
                 asset_id: invert ? last.key.base : last.key.quote
             }
         } : null;
+        let volumeBaseAsset = new Asset({amount: volumeBase, asset_id: baseAsset.get("id"), precision: baseAsset.get("precision")});
+        let volumeQuoteAsset = new Asset({amount: volumeQuote, asset_id: quoteAsset.get("id"), precision: quoteAsset.get("precision")});
         volumeBase = utils.get_asset_amount(volumeBase, baseAsset);
         volumeQuote = utils.get_asset_amount(volumeQuote, quoteAsset);
-        if (!Math.floor(volumeBase * 100)) {
-            this.lowVolumeMarkets = this.lowVolumeMarkets.set(market, true);
-        } else {
-            this.lowVolumeMarkets = this.lowVolumeMarkets.delete(market);
-        }
-        marketStorage.set("lowVolumeMarkets", this.lowVolumeMarkets.toJS());
 
+        let coreVolume = volumeBaseAsset.asset_id === "1.3.0" ? volumeBaseAsset.getAmount({real: true}) :
+            volumeQuoteAsset.asset_id === "1.3.0" ? volumeQuoteAsset.getAmount({real: true}) : null;
+        let usdVolume = !!coreVolume ? null : volumeBaseAsset.asset_id === "1.3.121" ? volumeBaseAsset.getAmount({real: true}) :
+            volumeQuoteAsset.asset_id === "1.3.121" ? volumeQuoteAsset.getAmount({real: true}) : null;
+        let btcVolume = (!!coreVolume || !!usdVolume) ? null : (volumeBaseAsset.asset_id === "1.3.861" || volumeBaseAsset.asset_id === "1.3.103") ? volumeBaseAsset.getAmount({real: true}) :
+                (volumeQuoteAsset.asset_id === "1.3.861" || volumeQuoteAsset.asset_id === "1.3.103") ? volumeQuoteAsset.getAmount({real: true}) : null;
+
+        if (market) {
+            if ((coreVolume && coreVolume <= 1000) || (usdVolume && usdVolume < 10) || (btcVolume && btcVolume < 0.01) || !Math.floor(volumeBase * 100)) {
+                this.lowVolumeMarkets = this.lowVolumeMarkets.set(market, true);
+                // console.log("lowVolume:", market, coreVolume, usdVolume, btcVolume, volumeBase);
+            } else {
+                this.lowVolumeMarkets = this.lowVolumeMarkets.delete(market);
+                /* Clear both market directions from the list */
+                let invertedMarket = market.split("_");
+                this.lowVolumeMarkets = this.lowVolumeMarkets.delete(invertedMarket[1] + "_" + invertedMarket[0]);
+            }
+            marketStorage.set("lowVolumeMarkets", this.lowVolumeMarkets.toJS());
+        }
         return {
             change: change.toFixed(2),
             volumeBase,
             volumeQuote,
             close: close,
-            latestPrice
+            latestPrice,
+            price,
+            volumeBaseAsset,
+            volumeQuoteAsset
         };
     }
 

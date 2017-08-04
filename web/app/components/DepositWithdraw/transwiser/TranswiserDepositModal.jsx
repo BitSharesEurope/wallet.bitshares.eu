@@ -14,35 +14,33 @@ class TranswiserDepositModal extends React.Component {
         qr:                React.PropTypes.string.isRequired,
         fee:               React.PropTypes.number.isRequired,
         modalId:           React.PropTypes.string.isRequired,
-        inventoryAsset:    ChainTypes.ChainAsset.isRequired
+        inventoryAsset:    ChainTypes.ChainAsset.isRequired,
+        onModalComplete:   React.PropTypes.func
     }
 
    constructor( props ) {
       super(props);
    }
 
-   gotoShop(){
-       window.open(this.props.depositUrl);
-   }
-
    render() {
+       let qr = this.props.qr && this.props.qr.replace("http://", "https://");
        return (
            <div className="grid-block vertical full-width-content">
                <div className="grid-container">
                    <div className="content-block">
                        <h3><Translate content="gateway.transwiser.deposit_title" asset={this.props.inventoryAsset.get('symbol')} /></h3>
                     </div>
-                    <div className="content-block">
+                    <div className="content-block hide">
                        <label><Translate content="gateway.inventory" /></label>
                        <AccountBalance account={this.props.issuerAccount.get('name')} asset={this.props.inventoryAsset.get('symbol')} />
                     </div>
                     <div className="content-block">
                        <label><Translate content="gateway.transwiser.visit_weidian" /></label>
-                       <a onClick={this.gotoShop.bind(this)} href={this.props.depositUrl} target="_blank">{this.props.depositUrl}</a>
+                       <a href={this.props.depositUrl} rel="noopener noreferrer" target="_blank">{this.props.depositUrl}</a>
                     </div>
                     <div className="content-block">
                        <label><Translate content="gateway.scan_qr" /></label>
-                       <img src={this.props.qr} />
+                       <img src={qr} />
                     </div>
                    {/*
                    <br/>

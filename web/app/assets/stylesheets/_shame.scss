@@ -348,6 +348,7 @@ select {
 select.bts-select {
     border-radius: 5px;
     cursor:pointer;
+    height: 2em;
     border: none;
     background: none;
     background-color: transparent;
@@ -356,7 +357,6 @@ select.bts-select {
     -webkit-appearance: menulist;
     -moz-appearance: menulist;
     appearance: menulist;
-    height: inherit;
 }
 
 @media screen and (min-width: 900px) {
@@ -381,15 +381,6 @@ select.bts-select {
     .column-hide-medium {
         display: none !important;
     }
-}
-
-.block-content-header {
-  font-size: 1.4375rem;
-  padding: 0.5rem 0;
-
-  @include breakpoint(small only) {
-      font-size: 1.125rem;
-  }
 }
 
 input, textarea {
@@ -422,6 +413,10 @@ section input[type="text"], section input[type="password"] {
   }
 }
 
+section progress {
+    max-width: 30rem;
+}
+
 .notification {
     table > tr > td {
         padding-left: 0 !important;
@@ -431,4 +426,8 @@ section input[type="text"], section input[type="password"] {
             line-height: 1.1rem;
         }
     }
+}
+
+.help-tooltip {
+    cursor: help;
 }

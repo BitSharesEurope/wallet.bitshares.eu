@@ -1,6 +1,6 @@
 import React from "react";
 import ZfApi from "react-foundation-apps/src/utils/foundation-api";
-import Modal from "react-foundation-apps/src/modal";
+import BaseModal from "../Modal/BaseModal";
 import Trigger from "react-foundation-apps/src/trigger";
 import Translate from "react-translate-component";
 import { Asset } from "common/MarketClasses";
@@ -209,6 +209,12 @@ class DepositWithdrawContent extends React.Component {
             });
     }
 
+    _openRegistrarSite(e) {
+        e.preventDefault();
+        let newWnd = window.open(SettingsStore.site_registr, "_blank");
+        newWnd.opener = null;
+    }
+
     _renderWithdraw() {
         const {name: assetName} = utils.replaceName(this.props.asset.get("symbol"), !!this.props.asset.get("bitasset"));
         let tabIndex = 1;
@@ -224,7 +230,7 @@ class DepositWithdrawContent extends React.Component {
         //             rpc_url={SettingsStore.rpc_url}
         //         />);
         //     }else{
-        //         return (<p>Click <a href='#' onClick={(e)=>{ window.open(SettingsStore.site_registr,'_blank');}} >here</a> to register for deposits </p>);
+        //         return (<p>Click <a href='#' onClick={this._openRegistrarSite} >here</a> to register for deposits </p>);
         //     }
         // }
 
@@ -293,7 +299,7 @@ class DepositWithdrawContent extends React.Component {
         //             rpc_url={SettingsStore.rpc_url}
         //         />);
         //     }else{
-        //         return (<p>Click <a href='#' onClick={(e)=>{ window.open(SettingsStore.site_registr,'_blank');}} >here</a> to register for deposits </p>);
+        //         return (<p>Click <a href='#' onClick={this._openRegistrarSite} >here</a> to register for deposits </p>);
         //     }
         // }
         return (
@@ -446,12 +452,9 @@ export default class SimpleDepositWithdrawModal extends React.Component {
 
     render() {
         return (
-            <Modal className="test" onClose={this.onClose.bind(this)} id={this.props.modalId} overlay={true}>
-                <Trigger close={this.props.modalId}>
-                    <a href="#" className="close-button">&times;</a>
-                </Trigger>
+            <BaseModal className="test" onClose={this.onClose.bind(this)} overlay={true} id={this.props.modalId}>
                 {this.state.open ? <DepositWithdrawContent {...this.props} open={this.state.open} /> : null}
-            </Modal>
+            </BaseModal>
         );
     }
 }

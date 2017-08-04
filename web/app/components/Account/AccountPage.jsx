@@ -46,7 +46,7 @@ class AccountPage extends React.Component {
                     />
                 </div>
                 <div className="grid-block main-content">
-                    <div className="grid-container" style={{paddingTop: 15}}>
+                    <div className="grid-container" style={{paddingTop: 25}}>
                     {React.cloneElement(
                         React.Children.only(this.props.children),
                         {
@@ -61,7 +61,8 @@ class AccountPage extends React.Component {
                             contained: true,
                             balances: account.get("balances", null),
                             orders: account.get("orders", null),
-                            backedCoins: this.props.backedCoins
+                            backedCoins: this.props.backedCoins,
+                            bridgeCoins: this.props.bridgeCoins
                         }
                     )}
                     </div>
@@ -93,7 +94,8 @@ export default connect(AccountPageStoreWrapper, {
             wallet_locked: WalletUnlockStore.getState().locked,
             myAccounts:  AccountStore.getState().myAccounts,
             viewSettings: SettingsStore.getState().viewSettings,
-            backedCoins: GatewayStore.getState().backedCoins
+            backedCoins: GatewayStore.getState().backedCoins,
+            bridgeCoins: GatewayStore.getState().bridgeCoins
         };
     }
 });

@@ -248,18 +248,18 @@ class TotalValue extends React.Component {
             totalsTip += `<tr><td>&nbsp;</td><td style="text-align: right;">${noDataSymbol} no data</td></tr>`;
 
         totalsTip += "</tbody></table>";
-
+        
         if (!inHeader) {
             return(
                 <span>
-                    {!!this.props.label ? (<span className="font-secondary"><Translate content={this.props.label} /> :</span>) : null}
+                    {!!this.props.label ? (<span className="font-secondary"><Translate content={this.props.label} />: </span>) : null}
                     <FormattedAsset noPrefix amount={totalValue} asset={toAsset.get("id")} decimalOffset={toAsset.get("symbol").indexOf("BTC") === -1 ? toAsset.get("precision") : 4}/>
                 </span>
             );
         } else {
             return (
                 <div className="tooltip inline-block" data-tip={totalsTip} data-place="bottom" data-html={true} >
-                    {!!this.props.label ? (<span className="font-secondary"><Translate content={this.props.label} /> :</span>) : null}
+                    {!!this.props.label ? (<span className="font-secondary"><Translate content={this.props.label} />: </span>) : null}
                     <FormattedAsset noTip noPrefix amount={totalValue} asset={toAsset.get("id")} decimalOffset={toAsset.get("symbol").indexOf("BTC") === -1 ? toAsset.get("precision") : 4}/>
                 </div>
             );
@@ -383,7 +383,17 @@ class AccountWrapper extends React.Component {
             }
         });
 
-        return balanceList.size ? <TotalBalanceValue label={this.props.label} inHeader={this.props.inHeader} balances={balanceList} openOrders={openOrders} debt={debt} collateral={collateral}/> : null;
+        if (!balanceList.size) {
+            return(
+                <span>
+                    {!!this.props.label ? (<span className="font-secondary"><Translate content={this.props.label} />: </span>) : null} 0
+                </span>
+            );
+        } else {
+            return <TotalBalanceValue label={this.props.label} inHeader={this.props.inHeader} balances={balanceList} openOrders={openOrders} debt={debt} collateral={collateral}/>;
+
+        }
+
     }
 }
 AccountWrapper = BindToChainState(AccountWrapper, {keep_updating: true});

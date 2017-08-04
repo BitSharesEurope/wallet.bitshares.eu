@@ -38,7 +38,11 @@ class Comment extends React.Component {
 
     render() {
         let {comment, date, user, color} = this.props;
-        let systemUsers = [counterpart.translate("chat.welcome_user"), "SYSTEM"];
+        let systemUsers = ["chat.welcome_user", "SYSTEM"];
+
+        if (comment === "chat.telegram_link") {
+            comment = <Translate content={comment} unsafe />;
+        }
 
         return (
             <div style={{padding: "3px 1px"}}>
@@ -54,7 +58,7 @@ class Comment extends React.Component {
                             fontWeight: "bold",
                             color: color
                         }}>
-                            {user}:&nbsp;
+                            {user === "chat.welcome_user" ? counterpart.translate(user) : user}:&nbsp;
                     </span>
                     <span className="chat-text">
                         {systemUsers.indexOf(user) !== -1 ? comment : comment.substr(0, 140)}
@@ -84,8 +88,12 @@ class Chat extends React.Component {
 
         this.state = {
             messages: [{
-                user: counterpart.translate("chat.welcome_user"),
+                user: "chat.welcome_user",
                 message: counterpart.translate("chat.welcome"),
+                color: "black"
+            },{
+                user: "SYSTEM",
+                message: "chat.telegram_link",
                 color: "black"
             }],
             connected: false,
@@ -238,7 +246,9 @@ class Chat extends React.Component {
             data.history.filter(a => {
                 return (
                     a.user !== "Welcome to BitShares" &&
-                    a.user !== "Welcome to Openledger"
+                    a.user !== "Welcome to Openledger" &&
+                    a.user !== "Bitshares'e Hoşgeldiniz" &&
+                    a.user !== "chat.welcome_user"
                 );
             }).forEach(msg => {
                 this.state.messages.push(msg);
@@ -616,7 +626,6 @@ class Chat extends React.Component {
                 </div>
             </div>
         );
-
         return (
             <div
                 id="chatbox"
@@ -627,15 +636,13 @@ class Chat extends React.Component {
                 }}
             >
                 {!showChat ?
-                <a className="toggle-controlbox" onClick={this.onToggleChat.bind(this)}>
-                    <span className="chat-toggle"><Translate content="chat.button" /></span>
-                </a> : null}
+                <div>Chat is disabled</div> : null}
 
                 <div style={chatStyle} className={"chatbox"}>
                     <div className={"grid-block main-content vertical " + (docked ? "docked" : "flyout")} >
                         <div className="chatbox-title grid-block shrink">
                             <Translate content="chat.title" />
-                            <span>&nbsp;- <Translate content="chat.users" count={this.connections.size + 1} /></span>
+                            <span>&nbsp;- <Translate content="chat.users" userCount={this.connections.size + 1} /></span>
                             <div className="chatbox-pin" onClick={this._onToggleDock.bind(this)}>
                                 {docked ? <Icon className="icon-14px rotate" name="thumb-tack"/> : <Icon className="icon-14px" name="thumb-tack"/>}
                             </div>
