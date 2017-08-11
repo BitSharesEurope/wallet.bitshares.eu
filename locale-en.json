@@ -1278,5 +1278,8 @@
   "dashboard": {
     "warning_title": "Backup required!",
     "warning_text": "BitShares is built on a decentralized blockchain. This means your funds are 100% in your control at all times. Unlike other cryptocurrency exchanges, we (the service provider) do not store your account information on our server.  The private keys to your account are stored in your web browser. If you do not have an account backup, you will lose your funds permanently when you delete your browser cache or format your hard drive. We (the service provider) cannot restore lost funds.  You must backup your own account!"
+  },
+  "trx_error": {
+      "expire": "Your transaction has expired without being confirmed, please try again later."
   }
 }
