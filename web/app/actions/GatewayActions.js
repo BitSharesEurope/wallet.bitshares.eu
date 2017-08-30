@@ -5,15 +5,13 @@ import {blockTradesAPIs} from "api/apiConfig";
 let inProgress = {};
 
 class GatewayActions {
-
     fetchCoins({backer = "OPEN", url = undefined} = {}) {
         return {};
         /*
         if (!inProgress["fetchCoins_" + backer]) {
             inProgress["fetchCoins_" + backer] = true;
             return (dispatch) => {
-                Promise.all([
-                    fetchCoins(url),
+                Promise.all([fetchCoins(url),
                     fetchBridgeCoins(blockTradesAPIs.BASE_OL),
                     getActiveWallets(url)
                 ]).then(result => {
