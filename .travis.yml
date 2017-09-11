@@ -9,13 +9,16 @@
 #
 
 language: node_js
-node_js: 6
+node_js: 7
 env:
   global:
   - GITHUB_REPO: BitSharesEurope/wallet.bitshares.eu
   - CXX=g++-4.8
   - secure: GTtLZrxWZ8ruP5xIloBvX7aegUK8jCgWnA/yUxNRL61hglU72TanqE94neGp28q5fnrfUGRCJOphXaHJuN/PxvDSdkFKPdHVrw46qSQhfAvl3RJWp3hkRLFit3ClCFtzkgH0UG5A7wZBkBRsNCNyubZHYDV0kJNUSiPe7yuUQXGQC6xvTiVNAVz94nPxB3zrJyhh6cAgqNjBscdO32oMCn8toChn37RejRHHmi/TXnzTZq0gwPOUZKdSCIm6jmIjyqQz6c9nfW8mbZfJKW3nAa1DU77CjGhfiaJof/7W9iBLFVT22xmlLKhxU/UY5dfILJpRZlexbwMNXvJ5lOYtVmPoV0XXiUpR42t98Nocii2JXVz4rT2JWsU/VqdG/SAufXKlc8GFc28I3UUxvKQXsV3B2e0KMQ6kVu82swLDK2sgID4otiefiikhSoF1ecgYI/aiDmhn3BdQrMj4GV34dQNs5nTjiUX3exe0CW2h9jyx6ktS6UOvmVgUp2Io7QC/er/1MrGOF9BDX/Fqyk/5j+3tw5q5pvQwXgC2yqfu3jO64RqXUJfAGAywwZ6rlPeZUDK8gMzi1sba2xYgnCP9qUMcmW2JgeFKFHE6bT5kh2QN5IQfyIAP6iQiBPJSWgBegl+wTh1SVB8tTZEsWTkpQilaGPMgcuz6YcRQjujZEBA=
   - secure: DH046cQkrfoMSeuC2EEcu5DCQFepOQ0y0b1TJh1f7zJkB9OQORwNmEUYWgGIBtbOdsgBIX96toqAlRE7yv3WcEox1EWZO7V05VGkGKWPKeIh/y35Typq06z7UZHhbyhgyJA+6M4BtuthAo+LyAVRsXep/30IvMwQHB+TvNN+PVxFI8i57WN+woaQ2pSZ3sQGe22uI0ntJvKWLBh6FTWErkRG30hsKX5tr4n2Xt/K2VlIhmTwyKymVoIHJJIJtfYJHcgrrSuhSFtUAwiPiWPCAEFKDk5nLDZhvMqDuI0PoLw/4LGFtjS4oIH3PCF9IKw49c1ENte9pdgjZp94PZPKmGZ7+wf04ylcXBzR6qed1fnJstn8PU4lHDQDFIcBVSWIMUfOgOwHT/iOaggAzK1I64KP846gf83JmKYl/biabAEpNQGwXVFpA0mulsYMyaPe4oG97WKz+6N4oOJWPqdAP6JMvFwRJPzHPv8sQ0lZeboK9qAduRXUEzmKonNJRYopGVHYQQbhbCVtfEBGJWf/Y4M4ggZfcJaGVLLRlueTe/sOma+96zO6ZVMFqWlxIjIK34/NDCiEG7pphTer2xqDY/pxv3n3hIsMUE86zQSN6LVSg26wIf7ZMoBK+MiF951LHbWvWe/D+QRrc50/UNhuhDzp0GvCLxGhTLKsGwR7K5A=
+cache:
+  directories:
+    - "node_modules"
 addons:
   apt:
     sources:
@@ -23,6 +26,9 @@ addons:
     packages:
     - gcc-4.8
     - g++-4.8
+    - icnsutils
+    - graphicsmagick
+    - xz-utils
 before_install: "./install.sh"
 script: "./build.sh"
 after_success: "./deploy.sh"
