@@ -44,7 +44,7 @@ class AccountOrders extends React.Component {
                 let baseID = parseInt(order.sell_price.base.asset_id.split(".")[2], 10);
                 let quoteID = parseInt(order.sell_price.quote.asset_id.split(".")[2], 10);
 
-                let limitOrder = new LimitOrder(order, assets, base.get("id"));
+                let limitOrder = new LimitOrder(order, assets, quoteID > baseID ? quote.get("id") : base.get("id"));
 
                 let marketID = quoteID > baseID ? `${quote.get("symbol")}_${base.get("symbol")}` : `${base.get("symbol")}_${quote.get("symbol")}`;
 
@@ -61,6 +61,7 @@ class AccountOrders extends React.Component {
                         };
                     }
                 }
+
 
                 let marketBase = ChainStore.getAsset(markets[marketID].base.id);
                 let marketQuote = ChainStore.getAsset(markets[marketID].quote.id);
@@ -98,7 +99,7 @@ class AccountOrders extends React.Component {
                         <MarketLink quote={markets[market].quote.id} base={markets[market].base.id} />
                     </h5>
                     <div className="exchange-bordered">
-                            <table className="table table-striped text-right ">
+                            <table className="table table-striped">
                                 <TableHeader baseSymbol={markets[market].base.symbol} quoteSymbol={markets[market].quote.symbol}/>
                                 <tbody>
                                     {marketOrders[market].sort((a, b) => {

@@ -12,12 +12,13 @@ import AccountStore from "stores/AccountStore";
 import ls from "common/localStorage";
 const STORAGE_KEY = "__graphene__";
 const ss = new ls(STORAGE_KEY);
-const apiLatencies = ss.get("apiLatencies", {});
 const latencyChecks = ss.get("latencyChecks", 1);
-let apiLatenciesCount = Object.keys(apiLatencies).length;
+import counterpart from "counterpart";
+
 // Actions
 import PrivateKeyActions from "actions/PrivateKeyActions";
 import SettingsActions from "actions/SettingsActions";
+import notify from "actions/NotificationActions";
 
 ChainStore.setDispatchFrequency(20);
 
@@ -48,6 +49,9 @@ const filterAndSortURLs = (count, latencies) => {
 };
 
 const willTransitionTo = (nextState, replaceState, callback, appInit=true) => { //appInit is true when called via router onEnter, and false when node is manually selected in access settings
+    const apiLatencies = SettingsStore.getState().apiLatencies;
+    let apiLatenciesCount = Object.keys(apiLatencies).length;
+
     if (connect) ss.set("latencyChecks", latencyChecks + 1); // Every 15 connect attempts we refresh the api latency list
     if (latencyChecks >= 15) {
         apiLatenciesCount = 0;
@@ -62,9 +66,16 @@ const willTransitionTo = (nextState, replaceState, callback, appInit=true) => { 
     */
     let connectionString = SettingsStore.getSetting("apiServer");
     if (!connectionString) connectionString = urls[0].url;
-    if (connectionString.indexOf("fake.automatic-selection") !== -1) connectionString = urls[0];
+    const autoSelection = connectionString.indexOf("fake.automatic-selection") !== -1;
+    if (autoSelection) {
+        connectionString = urls[0];
+    }
 
-    var onConnect = () => {
+    var onConnect = (res) => {
+        if (res && res[1] && res[1].ws_rpc) {
+            SettingsActions.changeSetting({setting: "activeNode", value: res[1].ws_rpc.ws.url});
+            if (!autoSelection) SettingsActions.changeSetting({setting: "apiServer", value: res[1].ws_rpc.ws.url});
+        }
         const currentChain = Apis.instance().chain_id;
         const chainChanged = oldChain && oldChain !== currentChain;
         oldChain = currentChain;
@@ -74,6 +85,8 @@ const willTransitionTo = (nextState, replaceState, callback, appInit=true) => { 
             db = iDB.init_instance(window.openDatabase ? (shimIndexedDB || indexedDB) : indexedDB).init_promise;
         } catch(err) {
             console.log("db init error:", err);
+            replaceState("/init-error");
+            callback();
         }
         return Promise.all([db, SettingsStore.init()]).then(() => {
             return Promise.all([
@@ -88,11 +101,15 @@ const willTransitionTo = (nextState, replaceState, callback, appInit=true) => { 
                         replaceState("/dashboard");
                     }
                 }).then(() => {
+                    console.log("onConnect", chainChanged);
                     if (chainChanged) {
                         ChainStore.clearCache();
                         ChainStore.subscribed = false;
                         ChainStore.init().then(() => {
-                            AccountStore.loadDbData(currentChain);
+                            AccountStore.reset();
+                            AccountStore.loadDbData(currentChain).catch(err => {
+                                console.error(err);
+                            });
                         });
                     }
                 })
@@ -102,45 +119,51 @@ const willTransitionTo = (nextState, replaceState, callback, appInit=true) => { 
                 }),
                 WalletManagerStore.init()
             ]).then(()=> {
-                ss.set("activeNode", connectionManager.url);
+                SettingsActions.changeSetting({setting: "activeNode", value: connectionManager.url});
                 callback();
             });
         });
-    }
+    };
 
     var onResetError = (err) => {
         console.log("err:", err);
-        return callback();
-    }
+        oldChain = "old";
+        connect = true;
+        notify.addNotification({
+            message: counterpart.translate("settings.connection_error", {url: connectionString}),
+            level: "error",
+            autoDismiss: 10
+        });
+        return Apis.close().then(() => {
+            return willTransitionTo(nextState, replaceState, callback, true);
+        });
+    };
 
     connectionManager = new Manager({url: connectionString, urls});
     if (nextState.location.pathname === "/init-error") {
-        return Apis.reset(connectionString, true).init_promise
-        .then(onConnect).catch(onResetError);
-
+        return Apis.reset(connectionString, true).then(instance => {
+            return instance.init_promise
+            .then(onConnect).catch(onResetError);
+        });
     }
     let connectionCheckPromise = !apiLatenciesCount ? connectionManager.checkConnections() : null;
     Promise.all([connectionCheckPromise]).then((res => {
         if (connectionCheckPromise && res[0]) {
             let [latencies] = res;
-            console.log("Connection latencies:", latencies);
-            urls = filterAndSortURLs(0, latencies);
-            ss.set("apiLatencies", latencies);
+            urls = filterAndSortURLs(Object.keys(latencies).length, latencies);
+            connectionManager.url = urls[0];
             connectionManager.urls = urls;
             /* Update the latencies object */
             SettingsActions.updateLatencies(latencies);
         }
-        let latencies = ss.get("apiLatencies", {});
-        let connectionStart = new Date().getTime();
+        // let latencies = ss.get("apiLatencies", {});
+        // let connectionStart = new Date().getTime();
 
         if(appInit){
-            connectionManager.connectWithFallback(connect).then(() => {
-                /* Update the latencies object and current active node */
-                latencies[connectionManager.url] = new Date().getTime() - connectionStart;
-                SettingsActions.changeSetting({setting: "apiServer", value: connectionManager.url});
-                SettingsActions.updateLatencies(latencies);
+            connectionManager.connectWithFallback(connect).then((res) => {
+                if (!autoSelection) SettingsActions.changeSetting({setting: "apiServer", value: connectionManager.url});
 
-                onConnect();
+                onConnect(res);
             }).catch( error => {
                 console.error("----- App.willTransitionTo error ----->", error, (new Error).stack);
                 if(error.name === "InvalidStateError") {
@@ -155,7 +178,10 @@ const willTransitionTo = (nextState, replaceState, callback, appInit=true) => { 
                 }
             });
         } else {
-            Apis.reset(connectionManager.url, true).init_promise.then(onConnect).catch(onResetError);
+            oldChain = "old";
+            Apis.reset(connectionManager.url, true).then(instance => {
+                instance.init_promise.then(onConnect).catch(onResetError);
+            });
         }
 
         /* Only try initialize the API with connect = true on the first onEnter */
@@ -166,7 +192,6 @@ const willTransitionTo = (nextState, replaceState, callback, appInit=true) => { 
     // Every 15 connections we check the latencies of the full list of nodes
     if (connect && !apiLatenciesCount && !connectionCheckPromise) connectionManager.checkConnections().then((res) => {
         console.log("Connection latencies:", res);
-        ss.set("apiLatencies", res);
         SettingsActions.updateLatencies(res);
     });
 };
