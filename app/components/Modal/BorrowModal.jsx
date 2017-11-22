@@ -19,8 +19,6 @@ import HelpContent from "../Utility/HelpContent";
 import Immutable from "immutable";
 import {ChainStore} from "bitsharesjs/es";
 
-let wallet_api = new WalletApi();
-
 /**
  *  Given an account and an asset id, render a modal allowing modification of a margin position for that asset
  *
@@ -124,7 +122,7 @@ class BorrowModalContent extends React.Component {
             short_amount: amount,
             collateral: (this.state.collateral_ratio * (amount / feed_price)).toFixed(this.props.backing_asset.get("precision")),
             collateral_ratio: this.state.collateral_ratio
-        }
+        };
 
         this.setState(newState);
         this._validateFields(newState);
@@ -145,7 +143,7 @@ class BorrowModalContent extends React.Component {
             short_amount: this.state.short_amount,
             collateral: amount,
             collateral_ratio: isFinite(collateralRatio) ? collateralRatio : this._getInitialCollateralRatio(this.props),
-        }
+        };
 
         this.setState(newState);
         this._validateFields(newState);
@@ -161,7 +159,7 @@ class BorrowModalContent extends React.Component {
             short_amount: this.state.short_amount,
             collateral: ((this.state.short_amount / feed_price) * ratio).toFixed(this.props.backing_asset.get("precision")),
             collateral_ratio: ratio
-        }
+        };
 
         this.setState(newState);
         this._validateFields(newState);
@@ -206,7 +204,7 @@ class BorrowModalContent extends React.Component {
         let backingPrecision = utils.get_asset_precision(this.props.backing_asset.get("precision"));
         let currentPosition = this._getCurrentPosition(this.props);
 
-        var tr = wallet_api.new_transaction();
+        var tr = WalletApi.new_transaction();
         tr.add_type_operation("call_order_update", {
             "fee": {
                 amount: 0,
@@ -265,7 +263,7 @@ class BorrowModalContent extends React.Component {
     }
 
     _getInitialCollateralRatio(props) {
-        return this._isPredictionMarket(props) ? 1 : 0
+        return this._isPredictionMarket(props) ? 1 : 0;
     }
 
     _getCollateralRatio(debt, collateral) {
@@ -344,7 +342,6 @@ class BorrowModalContent extends React.Component {
                                 <div className="borrow-price-feeds">
                                     <span className="borrow-price-label"><Translate content="transaction.feed_price" />:&nbsp;</span>
                                     <FormattedPrice
-                                        decimals={2}
                                         noPopOver
                                         quote_amount={quote_asset.getIn(["bitasset", "current_feed", "settlement_price", "base", "amount"])}
                                         quote_asset={quote_asset.getIn(["bitasset", "current_feed", "settlement_price", "base", "asset_id"])}
@@ -373,7 +370,6 @@ class BorrowModalContent extends React.Component {
                                 <span className="borrow-price-label"><Translate content="exchange.your_price" />:&nbsp;</span>
                                 {this.state.newPosition ?
                                     <FormattedPrice
-                                        decimals={2}
                                         noPopOver
                                         quote_amount={maintenanceRatio * this.state.short_amount * quotePrecision}
                                         quote_asset={quote_asset.get("id")}
@@ -413,7 +409,7 @@ class BorrowModalContent extends React.Component {
                             </div>) : null}
                         <div className="no-padding grid-content button-group no-overflow">
                             <div onClick={this._onSubmit.bind(this)} href className={buttonClass}><Translate content="borrow.adjust" /></div>
-                            <div onClick={(e) => {e.preventDefault(); this.setState(this._initialState(this.props))}} href className="button info"><Translate content="wallet.reset" /></div>
+                            <div onClick={(e) => {e.preventDefault(); this.setState(this._initialState(this.props));}} href className="button info"><Translate content="wallet.reset" /></div>
                             {/*<Trigger close={this.props.modalId}>
                                 <div className="button"><Translate content="account.perm.cancel" /></div>
                             </Trigger>*/}

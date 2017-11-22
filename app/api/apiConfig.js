@@ -6,7 +6,8 @@ export const blockTradesAPIs = {
     ACTIVE_WALLETS: "/active-wallets",
     TRADING_PAIRS: "/trading-pairs",
     DEPOSIT_LIMIT: "/deposit-limits",
-    ESTIMATE_OUTPUT: "/estimate-output-amount"
+    ESTIMATE_OUTPUT: "/estimate-output-amount",
+    ESTIMATE_INPUT: "/estimate-input-amount"
 };
 
 export const rudexAPIs = {
@@ -23,6 +24,7 @@ export const settingsAPIs = {
         {url: "wss://eu.openledger.info/ws", location: "Berlin, Germany"},
         {url: "wss://bit.btsabc.org/ws", location: "Hong Kong"},
         {url: "wss://bts.ai.la/ws", location: "Hong Kong"},
+        {url: "wss://bitshares.apasia.tech/ws", location: "Bangkok, Thailand"},
         {url: "wss://bitshares.dacplay.org/ws", location:  "Hangzhou, China"},
         {url: "wss://bitshares-api.wancloud.io/ws", location:  "China"},
         {url: "wss://openledger.hk/ws", location: "Hong Kong"},
