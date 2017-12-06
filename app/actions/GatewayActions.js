@@ -50,26 +50,6 @@ class GatewayActions {
         if (!inProgress["fetchCoinsSimple_" + backer]) {
             inProgress["fetchCoinsSimple_" + backer] = true;
             return (dispatch) => {
-                fetchCoinsSimple(url)
-                    .then(coins => {
-                        delete inProgress["fetchCoinsSimple_" + backer];
-
-                        dispatch({
-                            coins: coins,
-                            backer
-                        });
-                    });
-            };
-        } else {
-            return {};
-        }
-    }
-
-    fetchCoinsSimple({backer = "RUDEX", url = undefined} = {}) {
-
-        if (!inProgress["fetchCoinsSimple_" + backer]) {
-            inProgress["fetchCoinsSimple_" + backer] = true;
-            return (dispatch) => {
                 let fetchCoinsTimeout = setTimeout(onGatewayTimeout.bind(null, dispatch, backer), GATEWAY_TIMEOUT);
                 fetchCoinsSimple(url)
                     .then(coins => {

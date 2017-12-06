@@ -226,7 +226,8 @@ class AccountOverview extends React.Component {
             let {market} = assetUtils.parseDescription(asset.getIn(["options", "description"]));
             symbol = asset.get("symbol");
             if (!market) market = "USD";
-            let preferredMarket = market ? market : core_asset ? core_asset.get("symbol") : "BTS";
+            let preferredMarket = market ? market : preferredUnit;
+
 
             if (notCore && preferredMarket === symbol) preferredMarket = core_asset.get("symbol");
 
@@ -553,8 +554,6 @@ class AccountOverview extends React.Component {
         let showAssetPercent = settings.get("showAssetPercent", false);
 
         // Find the current Openledger coins
-        const currentDepositAsset = {};  
-        const currentWithdrawAsset = {};
         /*
         const currentDepositAsset = this.props.backedCoins.get("OPEN", []).find(c => {
             return c.symbol === this.state.depositAsset;
