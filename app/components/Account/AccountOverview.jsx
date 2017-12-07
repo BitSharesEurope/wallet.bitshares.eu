@@ -554,14 +554,12 @@ class AccountOverview extends React.Component {
         let showAssetPercent = settings.get("showAssetPercent", false);
 
         // Find the current Openledger coins
-        /*
         const currentDepositAsset = this.props.backedCoins.get("OPEN", []).find(c => {
             return c.symbol === this.state.depositAsset;
         }) || {};
         const currentWithdrawAsset = this.props.backedCoins.get("OPEN", []).find(c => {
             return c.symbol === this.state.withdrawAsset;
         }) || {};
-        */
         const currentBridges = this.props.bridgeCoins.get(this.state.bridgeAsset) || null;
 
         const preferredAsset = ChainStore.getAsset(preferredUnit);
