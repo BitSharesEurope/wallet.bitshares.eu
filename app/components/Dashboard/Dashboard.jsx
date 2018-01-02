@@ -12,8 +12,6 @@ import SettingsActions from "actions/SettingsActions";
 import WalletUnlockActions from "actions/WalletUnlockActions";
 import LoginSelector from "../LoginSelector";
 import cnames from "classnames";
-import SettingsActions from "actions/SettingsActions";
-import SettingsStore from "stores/SettingsStore";
 import { connect } from "alt-react";
 
 class Dashboard extends React.Component {
