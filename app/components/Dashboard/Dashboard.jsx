@@ -12,6 +12,9 @@ import SettingsActions from "actions/SettingsActions";
 import WalletUnlockActions from "actions/WalletUnlockActions";
 import LoginSelector from "../LoginSelector";
 import cnames from "classnames";
+import SettingsActions from "actions/SettingsActions";
+import SettingsStore from "stores/SettingsStore";
+import { connect } from "alt-react";
 
 class Dashboard extends React.Component {
 
@@ -31,13 +34,14 @@ class Dashboard extends React.Component {
                 ["CNY", "BTC"],
                 ["CNY", "SILVER"],
                 ["CNY", "HERO"],
-                ["RUBLE", "BTS"],
-                ["RUBLE", "BTC"],
-                ["RUBLE", "SILVER"],
-                ["RUBLE", "HERO"],
+                ["RUB", "BTS"],
+                ["RUB", "BTC"],
+                ["RUB", "SILVER"],
+                ["RUB", "HERO"],
                 ["USD", "CNY"],
                 ["USD", "EUR"],
-                ["USD", "RUBLE"],
+                ["USD", "RUB"],
+                ["RUBLE", "RUB"],
                 ["PPY", "BTS"],
             ],
             "39f5e2ed": [
@@ -247,4 +251,17 @@ class Dashboard extends React.Component {
     }
 }
 
-export default Dashboard;
+let DashboardWrapper = (props) => {
+    return <Dashboard {...props} />;
+};
+
+export default DashboardWrapper = connect(DashboardWrapper, {
+    listenTo() {
+        return [SettingsStore];
+    },
+    getProps() {
+        return {
+            viewSettings: SettingsStore.getState().viewSettings
+        };
+    }
+});

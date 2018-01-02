@@ -586,7 +586,7 @@ class AccountOverview extends React.Component {
                                     </div> : null}
                                 </div>
 
-                                <table className="table dashboard-table">
+                                <table className="table dashboard-table table-hover">
                                     <thead>
                                         <tr>
                                             <th style={{textAlign: "left"}} className="clickable" onClick={this._toggleSortOrder.bind(this, "alphabetic")}><Translate component="span" content="account.asset" /></th>
