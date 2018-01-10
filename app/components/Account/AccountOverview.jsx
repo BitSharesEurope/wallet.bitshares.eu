@@ -22,6 +22,7 @@ import BindToChainState from "../Utility/BindToChainState";
 import LinkToAssetById from "../Utility/LinkToAssetById";
 import utils from "common/utils";
 import BorrowModal from "../Modal/BorrowModal";
+import DepositModal from "../Modal/DepositModal";
 import ReactTooltip from "react-tooltip";
 import SimpleDepositWithdraw from "../Dashboard/SimpleDepositWithdraw";
 import SimpleDepositBlocktradesBridge from "../Dashboard/SimpleDepositBlocktradesBridge";
@@ -32,6 +33,7 @@ import AccountOrders from "./AccountOrders";
 import cnames from "classnames";
 import TranslateWithLinks from "../Utility/TranslateWithLinks";
 import { checkMarginStatus } from "common/accountHelper";
+import SendModal from "../Modal/SendModal";
 
 class AccountOverview extends React.Component {
 
@@ -168,6 +170,13 @@ class AccountOverview extends React.Component {
         SettingsActions.hideAsset(asset, status);
     }
 
+    _showDepositModal(asset, e) {
+        e.preventDefault();
+        this.setState({depositAsset: asset}, () => {
+            this.refs.deposit_modal_new.show();
+        });
+    }
+
     _showDepositWithdraw(action, asset, fiatModal, e) {
         e.preventDefault();
         this.setState({
@@ -185,6 +194,12 @@ class AccountOverview extends React.Component {
     _onNavigate(route, e) {
         e.preventDefault();
         this.props.router.push(route);
+    }
+
+    triggerSend(asset) {
+        this.setState({send_asset: asset}, () => {
+            this.refs.send_modal.show();
+        });
     }
 
     _renderBalances(balanceList, optionalAssets, visible) {
@@ -236,7 +251,7 @@ class AccountOverview extends React.Component {
                 <Link to={`/market/${asset.get("symbol")}_${preferredMarket}`}><Icon name="trade" className="icon-14px" /></Link> :
                 notCorePrefUnit ? <Link to={`/market/${asset.get("symbol")}_${preferredUnit}`}><Icon name="trade" className="icon-14px" /></Link> :
                 emptyCell;
-            transferLink = <Link to={`/transfer?asset=${asset.get("id")}`}><Icon name="transfer" className="icon-14px" /></Link>;
+            transferLink = <a onClick={this.triggerSend.bind(this, asset.get("id"))}><Icon name="transfer" className="icon-14px" /></a>;
 
             let {isBitAsset, borrowModal, borrowLink} = renderBorrow(asset, this.props.account);
 
@@ -248,6 +263,13 @@ class AccountOverview extends React.Component {
             const includeAsset = !hiddenAssets.includes(asset_type);
             const hasBalance = !!balanceObject.get("balance");
             const hasOnOrder = !!orders[asset_type];
+
+            const thisAssetName = asset.get("symbol").split(".");
+            const canDeposit =
+                !!this.props.backedCoins.get("OPEN", []).find(a => a.backingCoinType === thisAssetName[1]) ||
+                !!this.props.backedCoins.get("RUDEX", []).find(a => a.backingCoin === thisAssetName[1]) ||
+                asset.get("symbol") == "BTS";
+
             const canDepositWithdraw = false;  //!!this.props.backedCoins.get("OPEN", []).find(a => a.symbol === asset.get("symbol"));
             const canWithdraw = canDepositWithdraw && (hasBalance && balanceObject.get("balance") != 0);
             const canBuy = !!this.props.bridgeCoins.get(symbol);
@@ -300,11 +322,9 @@ class AccountOverview extends React.Component {
                         </span> : emptyCell}
                     </td>
                     <td>
-                        {canDepositWithdraw && this.props.isMyAccount? (
+                        {canDeposit && this.props.isMyAccount? (
                             <span>
-                                <a onClick={this._showDepositWithdraw.bind(this, "deposit_modal", assetName, false)}>
-                                    <Icon name="deposit" className="icon-14px" />
-                                </a>
+                                <Icon style={{cursor: "pointer"}} name="deposit" className="icon-14x" onClick={this._showDepositModal.bind(this, assetName)} />
                             </span>
                         ) : emptyCell}
                     </td>
@@ -358,7 +378,15 @@ class AccountOverview extends React.Component {
                 if (asset && this.props.isMyAccount) {
                     const includeAsset = !hiddenAssets.includes(asset.get("id"));
 
-                    const canDepositWithdraw = false;  // !!this.props.backedCoins.get("OPEN", []).find(a => a.symbol === asset.get("symbol"));
+                    const thisAssetName = asset.get("symbol").split(".");
+                    const canDeposit = false
+                    /*
+                    const canDeposit =
+                        !!this.props.backedCoins.get("OPEN", []).find(a => a.backingCoinType === thisAssetName[1]) ||
+                        !!this.props.backedCoins.get("RUDEX", []).find(a => a.backingCoin === thisAssetName[1]) ||
+                        asset.get("symbol") == "BTS";
+                    */
+
                     const canBuy = !!this.props.bridgeCoins.get(asset.get("symbol"));
 
                     const notCore = asset.get("id") !== "1.3.0";
@@ -386,12 +414,10 @@ class AccountOverview extends React.Component {
                                 </span> : emptyCell}
                             </td>
                             <td>
-                                {canDepositWithdraw && this.props.isMyAccount ?
+                            {canDeposit && this.props.isMyAccount? (
                                 <span>
-                                    <a onClick={this._showDepositWithdraw.bind(this, "deposit_modal", a, false)}>
-                                        <Icon name="deposit" className="icon-14px" />
-                                    </a>
-                                </span> : emptyCell}
+                                    <Icon style={{cursor: "pointer"}} name="deposit" className="icon-14x" onClick={this._showDepositModal.bind(this, asset.get("symbol"))} />
+                                </span>) : emptyCell}
                             </td>
                             <td>{emptyCell}</td>
                             <td style={{textAlign: "center"}}>
@@ -554,9 +580,9 @@ class AccountOverview extends React.Component {
         let showAssetPercent = settings.get("showAssetPercent", false);
 
         // Find the current Openledger coins
-        const currentDepositAsset = this.props.backedCoins.get("OPEN", []).find(c => {
-            return c.symbol === this.state.depositAsset;
-        }) || {};
+        // const currentDepositAsset = this.props.backedCoins.get("OPEN", []).find(c => {
+        //     return c.symbol === this.state.depositAsset;
+        // }) || {};
         const currentWithdrawAsset = this.props.backedCoins.get("OPEN", []).find(c => {
             return c.symbol === this.state.withdrawAsset;
         }) || {};
@@ -584,6 +610,10 @@ class AccountOverview extends React.Component {
                                     {hiddenBalances.length ? <div className={cnames("inline-block", {inactive: !showHidden})} onClick={!showHidden ? this._toggleHiddenAssets.bind(this) : () => {}}>
                                         <Translate content="account.show_hidden" />
                                     </div> : null}
+
+                                    {/* Send Modal */}
+                                    <SendModal id="send_modal_portfolio" ref="send_modal" from_name={this.props.account.get("name")} asset_id={this.state.send_asset || "1.3.0"}/>
+
                                 </div>
 
                                 <table className="table dashboard-table table-hover">
@@ -623,13 +653,10 @@ class AccountOverview extends React.Component {
                                 <AccountOrders {...this.props}>
                                     <tbody>
                                         <tr className="total-value">
-                                            <td style={{textAlign: "center"}} colSpan="3">
+                                            <td colSpan="7" style={{textAlign: "right"}}>
                                                 {totalValueText}
                                             </td>
-                                            <td colSpan="3"></td>
-                                            <td style={{textAlign: "right"}}>{ordersValue}</td>
-                                            <td colSpan="1"></td>
-                                            <td></td>
+                                            <td colSpan="2" style={{textAlign: "left"}}>{ordersValue}</td>
                                             {this.props.isMyAccount ? <td></td> : null}
                                         </tr>
                                     </tbody>
@@ -683,7 +710,7 @@ class AccountOverview extends React.Component {
                 </div>
 
                 {/* Deposit Modal */}
-                <SimpleDepositWithdraw
+                {/* <SimpleDepositWithdraw
                     ref="deposit_modal"
                     action="deposit"
                     fiatModal={this.state.fiatModal}
@@ -694,9 +721,9 @@ class AccountOverview extends React.Component {
                     balances={this.props.balances}
                     {...currentDepositAsset}
                     isDown={this.props.gatewayDown.get("OPEN")}
-                />
+                /> */}
 
-                {/* Withdraw Modal */}
+                {/* Withdraw Modal*/}
                 <SimpleDepositWithdraw
                     ref="withdraw_modal"
                     action="withdraw"
@@ -708,6 +735,15 @@ class AccountOverview extends React.Component {
                     balances={this.props.balances}
                     {...currentWithdrawAsset}
                     isDown={this.props.gatewayDown.get("OPEN")}
+                />
+
+                {/* Deposit Modal */}
+                <DepositModal
+                    ref="deposit_modal_new"
+                    modalId="deposit_modal_new"
+                    asset={this.state.depositAsset}
+                    account={this.props.account.get("name")}
+                    backedCoins={this.props.backedCoins}
                 />
 
                 {/* Bridge modal */}
