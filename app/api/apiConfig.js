@@ -47,7 +47,7 @@ export const settingsAPIs = {
         {url: "wss://kc-us-dex.xeldal.com/ws", location: "Kansas City, USA"},
         {url: "wss://la.dexnode.net/ws", location: "Los Angeles, USA"},
         {url: "wss://btsza.co.za:8091/ws", location: "Cape Town, South Africa"},
-        {url: "wss://api.bts.blckchnd.com", location: "Germany"}
+        {url: "wss://api.bts.blckchnd.com", location: "Falkenstein, Germany"}
     ],
     DEFAULT_FAUCET: "https://faucet.bitshares.eu",
     TESTNET_FAUCET: "https://faucet.testnet.bitshares.eu",
