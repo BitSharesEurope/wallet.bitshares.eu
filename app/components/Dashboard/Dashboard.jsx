@@ -7,11 +7,10 @@ import MarketCard from "./MarketCard";
 import utils from "common/utils";
 import { Apis } from "bitsharesjs-ws";
 import LoadingIndicator from "../LoadingIndicator";
-import SettingsStore from "stores/SettingsStore";
-import SettingsActions from "actions/SettingsActions";
-import WalletUnlockActions from "actions/WalletUnlockActions";
 import LoginSelector from "../LoginSelector";
 import cnames from "classnames";
+import SettingsActions from "actions/SettingsActions";
+import SettingsStore from "stores/SettingsStore";
 import { connect } from "alt-react";
 
 class Dashboard extends React.Component {
@@ -57,7 +56,6 @@ class Dashboard extends React.Component {
             newAssets: [
 
             ],
-            removeBackupWarning: SettingsStore.getState().settings.get("removeBackupWarning", false),
             currentEntry: props.currentEntry
         };
 
@@ -89,15 +87,6 @@ class Dashboard extends React.Component {
 
     componentWillUnmount() {
         window.removeEventListener("resize", this._setDimensions);
-    }
-
-    _onCloseWarning() {
-        let newVal = !this.state.removeBackupWarning
-        this.setState({
-            removeBackupWarning: newVal
-        });
-        SettingsActions.changeSetting({setting: "removeBackupWarning", value: newVal });
-        this.forceUpdate(); // Not sure why this is needed
     }
 
     _setDimensions() {
@@ -172,32 +161,11 @@ class Dashboard extends React.Component {
             return <LoginSelector />;
         }
 
-        let warning = (!this.state.removeBackupWarning) ?
-                <div className="grid-container">
-                    <div className="grid-block no-overflow">
-                        <div className="callout warning">
-                          <Translate content="dashboard.warning_title" component="h4" />
-                          <Translate content="dashboard.warning_text" component="p" />
-                          <div className="button success" onClick={() => {this.props.router.push("/wallet/backup/create");}}>
-                           <Translate content="settings.backup_text" />
-                          </div>
-                          <div className="button success" onClick={() => {this.props.router.push("/wallet/backup/restore");}}>
-                           <Translate content="settings.restore" />
-                          </div>
-                          <button className={"button outline"} type="button"
-                                  onClick={this._onCloseWarning.bind(this)}>
-                                  Understood!
-                          </button>
-                        </div>
-                    </div>
-                </div>
-               : null;
         const entries = ["accounts", "contacts", "recent"];
         const activeIndex = entries.indexOf(currentEntry);
 
         return (
             <div ref="wrapper" className="grid-block page-layout vertical">
-                {warning}
                 <div ref="container" className="grid-container" style={{padding: "2rem 8px"}}>
                     {this.props.onlyAccounts ? null : <div className="block-content-header" style={{marginBottom: 15, paddingTop: 0}}>
                         <Translate content="exchange.featured"/>
