@@ -1,11 +1,11 @@
 import alt from "alt-instance";
 import SettingsActions from "actions/SettingsActions";
 import IntlActions from "actions/IntlActions";
-import Immutable from "immutable";
+import Immutable, {fromJS} from "immutable";
 import {merge} from "lodash";
 import ls from "common/localStorage";
-import { Apis } from "bitsharesjs-ws";
-import { settingsAPIs } from "api/apiConfig";
+import {Apis} from "bitsharesjs-ws";
+import {settingsAPIs} from "api/apiConfig";
 
 const CORE_ASSET = "BTS"; // Setting this to BTS to prevent loading issues when used with BTS chain which is the most usual case currently
 
@@ -22,6 +22,8 @@ class SettingsStore {
         });
 
         this.bindListeners({
+            onSetExchangeLastExpiration:
+                SettingsActions.setExchangeLastExpiration,
             onChangeSetting: SettingsActions.changeSetting,
             onChangeViewSetting: SettingsActions.changeViewSetting,
             onChangeMarketDirection: SettingsActions.changeMarketDirection,
@@ -30,7 +32,10 @@ class SettingsStore {
             onClearStarredMarkets: SettingsActions.clearStarredMarkets,
             onAddWS: SettingsActions.addWS,
             onRemoveWS: SettingsActions.removeWS,
+            onShowWS: SettingsActions.showWS,
+            onHideWS: SettingsActions.hideWS,
             onHideAsset: SettingsActions.hideAsset,
+            onHideMarket: SettingsActions.hideMarket,
             onClearSettings: SettingsActions.clearSettings,
             onSwitchLocale: IntlActions.switchLocale,
             onSetUserMarket: SettingsActions.setUserMarket,
@@ -47,7 +52,13 @@ class SettingsStore {
             showAssetPercent: false,
             walletLockTimeout: 60 * 10,
             themes: "darkTheme",
-            passwordLogin: true
+            passwordLogin: true,
+            browser_notifications: {
+                allow: true,
+                additional: {
+                    transferToMe: true
+                }
+            }
         });
 
         // If you want a default value to be translated, add the translation to settings in locale-xx.js
@@ -64,30 +75,14 @@ class SettingsStore {
                 "es",
                 "it",
                 "tr",
-                "ru"
+                "ru",
+                "ja"
             ],
             apiServer: apiServer,
-            unit: [
-                CORE_ASSET,
-                "USD",
-                "CNY",
-                "BTC",
-                "EUR",
-                "GBP"
-            ],
-            showSettles: [
-                {translate: "yes"},
-                {translate: "no"}
-            ],
-            showAssetPercent: [
-                {translate: "yes"},
-                {translate: "no"}
-            ],
-            themes: [
-                "darkTheme",
-                "lightTheme",
-                "midnightTheme"
-            ],
+            unit: [CORE_ASSET, "USD", "CNY", "BTC", "EUR", "GBP"],
+            showSettles: [{translate: "yes"}, {translate: "no"}],
+            showAssetPercent: [{translate: "yes"}, {translate: "no"}],
+            themes: ["darkTheme", "lightTheme", "midnightTheme"],
             passwordLogin: [
                 {translate: "cloud_login"},
                 {translate: "local_wallet"}
@@ -98,7 +93,9 @@ class SettingsStore {
             // ]
         };
 
-        this.settings = Immutable.Map(merge(this.defaultSettings.toJS(), ss.get("settings_v3")));
+        this.settings = Immutable.Map(
+            merge(this.defaultSettings.toJS(), ss.get("settings_v3"))
+        );
         if (this.settings.get("themes") === "olDarkTheme") {
             this.settings = this.settings.set("themes", "midnightTheme");
         }
@@ -109,16 +106,12 @@ class SettingsStore {
             if (cnIdx !== -1) savedDefaults.locale[cnIdx] = "zh";
         }
         if (savedDefaults && savedDefaults.themes) {
-            let olIdx = savedDefaults.themes.findIndex(a => a === "olDarkTheme");
+            let olIdx = savedDefaults.themes.findIndex(
+                a => a === "olDarkTheme"
+            );
             if (olIdx !== -1) savedDefaults.themes[olIdx] = "midnightTheme";
         }
-        if (savedDefaults.apiServer) {
-            savedDefaults.apiServer = savedDefaults.apiServer.filter(a => {
-                return !defaults.apiServer.find(b => {
-                    return b.url === a.url;
-                });
-            });
-        }
+
         this.defaults = merge({}, defaults, savedDefaults);
 
         (savedDefaults.apiServer || []).forEach(api => {
@@ -137,7 +130,11 @@ class SettingsStore {
             }
         });
 
-        if (!savedDefaults || (savedDefaults && (!savedDefaults.apiServer || !savedDefaults.apiServer.length))) {
+        if (
+            !savedDefaults ||
+            (savedDefaults &&
+                (!savedDefaults.apiServer || !savedDefaults.apiServer.length))
+        ) {
             for (let i = apiServer.length - 1; i >= 0; i--) {
                 let hasApi = false;
                 this.defaults.apiServer.forEach(api => {
@@ -156,15 +153,24 @@ class SettingsStore {
         this.marketDirections = Immutable.Map(ss.get("marketDirections"));
 
         this.hiddenAssets = Immutable.List(ss.get("hiddenAssets", []));
+        this.hiddenMarkets = Immutable.List(ss.get("hiddenMarkets", []));
 
         this.apiLatencies = ss.get("apiLatencies", {});
 
-        this.mainnet_faucet = ss.get("mainnet_faucet", settingsAPIs.DEFAULT_FAUCET);
-        this.testnet_faucet = ss.get("testnet_faucet", settingsAPIs.TESTNET_FAUCET);
+        this.mainnet_faucet = ss.get(
+            "mainnet_faucet",
+            settingsAPIs.DEFAULT_FAUCET
+        );
+        this.testnet_faucet = ss.get(
+            "testnet_faucet",
+            settingsAPIs.TESTNET_FAUCET
+        );
+
+        this.exchange = fromJS(ss.get("exchange", {}));
     }
 
     init() {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             if (this.initDone) resolve();
             this.starredKey = this._getChainKey("markets");
             this.marketsKey = this._getChainKey("userMarkets");
@@ -174,8 +180,10 @@ class SettingsStore {
                     "BTS", "BTC", "USD", "CNY", "EUR", "GOLD", "SILVER",
                     "RUB", "PPY"
                 ],
-                markets_39f5e2ed: [ // TESTNET
-                    "PEG.FAKEUSD", "BTWTY"
+                markets_39f5e2ed: [
+                    // TESTNET
+                    "PEG.FAKEUSD",
+                    "BTWTY"
                 ]
             };
 
@@ -183,12 +191,16 @@ class SettingsStore {
                 markets_4018d784: [ // BTS MAIN NET
                     "USD", "CNY", "BTS", "BTC"
                 ],
-                markets_39f5e2ed: [ // TESTNET
+                markets_39f5e2ed: [
+                    // TESTNET
                     "TEST"
                 ]
             };
 
-            let coreAssets = {markets_4018d784: "BTS", markets_39f5e2ed: "TEST"};
+            let coreAssets = {
+                markets_4018d784: "BTS",
+                markets_39f5e2ed: "TEST"
+            };
             let coreAsset = coreAssets[this.starredKey] || "BTS";
             this.defaults.unit[0] = coreAsset;
 
@@ -196,11 +208,16 @@ class SettingsStore {
             this.preferredBases = Immutable.List(chainBases);
 
             function addMarkets(target, base, markets) {
-                markets.filter(a => {
-                    return a !== base;
-                }).forEach(market => {
-                    target.push([`${market}_${base}`, {"quote": market,"base": base}]);
-                });
+                markets
+                    .filter(a => {
+                        return a !== base;
+                    })
+                    .forEach(market => {
+                        target.push([
+                            `${market}_${base}`,
+                            {quote: market, base: base}
+                        ]);
+                    });
             }
 
             let defaultMarkets = [];
@@ -223,12 +240,9 @@ class SettingsStore {
     }
 
     onChangeSetting(payload) {
-        this.settings = this.settings.set(
-            payload.setting,
-            payload.value
-        );
+        this.settings = this.settings.set(payload.setting, payload.value);
 
-        switch(payload.setting) {
+        switch (payload.setting) {
             case "faucet_address":
                 if (payload.value.indexOf("testnet") === -1) {
                     this.mainnet_faucet = payload.value;
@@ -240,12 +254,11 @@ class SettingsStore {
                 break;
 
             case "apiServer":
-                let faucetUrl = payload.value.indexOf("testnet") !== -1 ?
-                    this.testnet_faucet : this.mainnet_faucet;
-                this.settings = this.settings.set(
-                    "faucet_address",
-                    faucetUrl
-                );
+                let faucetUrl =
+                    payload.value.indexOf("testnet") !== -1
+                        ? this.testnet_faucet
+                        : this.mainnet_faucet;
+                this.settings = this.settings.set("faucet_address", faucetUrl);
                 break;
 
             case "walletLockTimeout":
@@ -269,7 +282,10 @@ class SettingsStore {
 
     onChangeMarketDirection(payload) {
         for (let key in payload) {
-            this.marketDirections = this.marketDirections.set(key, payload[key]);
+            this.marketDirections = this.marketDirections.set(
+                key,
+                payload[key]
+            );
         }
         ss.set("marketDirections", this.marketDirections.toJS());
     }
@@ -277,7 +293,9 @@ class SettingsStore {
     onHideAsset(payload) {
         if (payload.id) {
             if (!payload.status) {
-                this.hiddenAssets = this.hiddenAssets.delete(this.hiddenAssets.indexOf(payload.id));
+                this.hiddenAssets = this.hiddenAssets.delete(
+                    this.hiddenAssets.indexOf(payload.id)
+                );
             } else {
                 this.hiddenAssets = this.hiddenAssets.push(payload.id);
             }
@@ -286,10 +304,27 @@ class SettingsStore {
         ss.set("hiddenAssets", this.hiddenAssets.toJS());
     }
 
+    onHideMarket(payload) {
+        if (payload.id) {
+            if (!payload.status) {
+                this.hiddenMarkets = this.hiddenMarkets.delete(
+                    this.hiddenMarkets.indexOf(payload.id)
+                );
+            } else {
+                this.hiddenMarkets = this.hiddenMarkets.push(payload.id);
+            }
+        }
+
+        ss.set("hiddenMarkets", this.hiddenMarkets.toJS());
+    }
+
     onAddStarMarket(market) {
         let marketID = market.quote + "_" + market.base;
         if (!this.starredMarkets.has(marketID)) {
-            this.starredMarkets = this.starredMarkets.set(marketID, {quote: market.quote, base: market.base});
+            this.starredMarkets = this.starredMarkets.set(marketID, {
+                quote: market.quote,
+                base: market.base
+            });
 
             ss.set(this.starredKey, this.starredMarkets.toJS());
         } else {
@@ -300,7 +335,10 @@ class SettingsStore {
     onSetUserMarket(payload) {
         let marketID = payload.quote + "_" + payload.base;
         if (payload.value) {
-            this.userMarkets = this.userMarkets.set(marketID, {quote: payload.quote, base: payload.base});
+            this.userMarkets = this.userMarkets.set(marketID, {
+                quote: payload.quote,
+                base: payload.base
+            });
         } else {
             this.userMarkets = this.userMarkets.delete(marketID);
         }
@@ -315,7 +353,7 @@ class SettingsStore {
         ss.set(this.starredKey, this.starredMarkets.toJS());
     }
 
-    onClearStarredMarkets(){
+    onClearStarredMarkets() {
         this.starredMarkets = Immutable.Map({});
         ss.set(this.starredKey, this.starredMarkets.toJS());
     }
@@ -330,6 +368,18 @@ class SettingsStore {
 
     onRemoveWS(index) {
         this.defaults.apiServer.splice(index, 1);
+        ss.set("defaults_v1", this.defaults);
+    }
+
+    onHideWS(url) {
+        let node = this.defaults.apiServer.find(node => node.url === url);
+        node.hidden = true;
+        ss.set("defaults_v1", this.defaults);
+    }
+
+    onShowWS(url) {
+        let node = this.defaults.apiServer.find(node => node.url === url);
+        node.hidden = false;
         ss.set("defaults_v1", this.defaults);
     }
 
@@ -364,6 +414,24 @@ class SettingsStore {
 
     setLastBudgetObject(value) {
         ss.set(this._getChainKey("lastBudgetObject"), value);
+    }
+
+    setExchangeSettings(key, value) {
+        this.exchange = this.exchange.set(key, value);
+
+        ss.set("exchange", this.exchange.toJS());
+    }
+
+    getExchangeSettings(key) {
+        return this.exchange.get(key);
+    }
+
+    onSetExchangeLastExpiration(value) {
+        this.setExchangeSettings("lastExpiration", fromJS(value));
+    }
+
+    getExhchangeLastExpiration() {
+        return this.getExchangeSettings("lastExpiration");
     }
 }
 

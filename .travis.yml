@@ -9,7 +9,7 @@
 #
 
 language: node_js
-node_js: 7
+node_js: 9
 env:
   global:
   - GITHUB_REPO: BitSharesEurope/wallet.bitshares.eu
@@ -29,6 +29,7 @@ addons:
     - icnsutils
     - graphicsmagick
     - xz-utils
-before_install: "./install.sh"
+install:
+  - npm i
 script: "./build.sh"
 after_success: "./deploy.sh"
