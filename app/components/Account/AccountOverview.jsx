@@ -51,11 +51,7 @@ class AccountOverview extends React.Component {
             depositAsset: null,
             withdrawAsset: null,
             bridgeAsset: null,
-            alwaysShowAssets: [
-                "BTS",
-                "USD",
-                "CNY",
-            ]
+            alwaysShowAssets: ["BTS", "USD", "CNY"]
         };
 
         this.qtyRefs = {};
@@ -97,9 +93,9 @@ class AccountOverview extends React.Component {
             if (aRef && bRef) {
                 let aPrice = aRef.getFinalPrice(true);
                 let bPrice = bRef.getFinalPrice(true);
-                if (!aPrice && bPrice) return 1;
-                if (aPrice && !bPrice) return -1;
-                if (!aPrice && !bPrice)
+                if (aPrice === null && bPrice !== null) return 1;
+                if (aPrice !== null && bPrice === null) return -1;
+                if (aPrice === null && bPrice === null)
                     return this.sortFunctions.alphabetic(a, b, true);
                 return this.state.sortDirection
                     ? aPrice - bPrice
@@ -169,10 +165,6 @@ class AccountOverview extends React.Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         return (
-            !utils.are_equal_shallow(
-                nextProps.balanceAssets,
-                this.props.balanceAssets
-            ) ||
             !utils.are_equal_shallow(
                 nextProps.backedCoins,
                 this.props.backedCoins
@@ -340,7 +332,6 @@ class AccountOverview extends React.Component {
             if (!market) market = "USD";
             let preferredMarket = market ? market : preferredUnit;
 
-
             if (notCore && preferredMarket === symbol)
                 preferredMarket = core_asset.get("symbol");
 
@@ -392,7 +383,7 @@ class AccountOverview extends React.Component {
             */
 
             const canWithdraw = false;
-             /*
+            /*
                 backedCoin &&
                 backedCoin.withdrawalAllowed &&
                 (hasBalance && balanceObject.get("balance") != 0);
@@ -456,7 +447,6 @@ class AccountOverview extends React.Component {
                                 balance={balance}
                                 toAsset={preferredUnit}
                                 hide_asset
-                                pulsate={{reverse: true, fill: "forwards"}}
                                 refCallback={c => {
                                     if (c && c.refs.bound_component)
                                         this.valueRefs[asset.get("symbol")] =
@@ -988,11 +978,12 @@ class AccountOverview extends React.Component {
 
         includedBalances.push(
             <tr key="portfolio" className="total-value">
-                <td style={{textAlign: "left"}}>{totalValueText}</td>
-                <td />
+                <td colSpan="2" style={{textAlign: "left"}}>
+                    {totalValueText}
+                </td>
                 <td className="column-hide-small" />
-                <td />
-                <td className="column-hide-small" style={{textAlign: "right"}}>
+                <td className="column-hide-small" />
+                <td style={{textAlign: "right"}}>
                     {portfolioActiveAssetsBalance}
                 </td>
                 <td colSpan="9" />
@@ -1001,11 +992,12 @@ class AccountOverview extends React.Component {
 
         hiddenBalances.push(
             <tr key="portfolio" className="total-value">
-                <td style={{textAlign: "left"}}>{totalValueText}</td>
-                <td />
+                <td colSpan="2" style={{textAlign: "left"}}>
+                    {totalValueText}
+                </td>
                 <td className="column-hide-small" />
-                <td />
-                <td className="column-hide-small" style={{textAlign: "right"}}>
+                <td className="column-hide-small" />
+                <td style={{textAlign: "right"}}>
                     {portfolioHiddenAssetsBalance}
                 </td>
                 <td colSpan="9" />
@@ -1157,6 +1149,7 @@ class AccountOverview extends React.Component {
                                                     <Translate content="exchange.price" />{" "}
                                                     (<AssetName
                                                         name={preferredUnit}
+                                                        noTip
                                                     />)
                                                 </th>
                                                 <th
@@ -1187,6 +1180,7 @@ class AccountOverview extends React.Component {
                                                                 arg: "asset"
                                                             }
                                                         ]}
+                                                        noTip
                                                     />
                                                 </th>
                                                 {showAssetPercent ? (
@@ -1406,10 +1400,6 @@ class AccountOverview extends React.Component {
 }
 
 AccountOverview = AssetWrapper(AccountOverview, {propNames: ["core_asset"]});
-AccountOverview = AssetWrapper(AccountOverview, {
-    propNames: ["balanceAssets"],
-    asList: true
-});
 
 export default class AccountOverviewWrapper extends React.Component {
     render() {
