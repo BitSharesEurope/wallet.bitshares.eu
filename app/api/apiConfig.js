@@ -77,6 +77,10 @@ export const settingsAPIs = {
         {
             url: "wss://testnet.nodes.bitshares.ws",
             location: "TESTNET - BitShares Infrastructure Program"
+        },
+        {
+            url: "wss://testnet.bitshares.apasia.tech/ws",
+            location: "TESTNET - APT BitShares (Dallas, USA)"
         }
     ],
     DEFAULT_FAUCET: "https://faucet.bitshares.eu",
