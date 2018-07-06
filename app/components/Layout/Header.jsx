@@ -1348,7 +1348,6 @@ class Header extends React.Component {
                                     </div>
                                 </li>
 
-                                {/*
                                 <li
                                     className={cnames(
                                         {
@@ -1467,7 +1466,6 @@ class Header extends React.Component {
                                         <Translate content="modal.withdraw.submit_beta" />
                                     </div>
                                 </li>
-                               */}
 
                                 <li
                                     className={cnames(

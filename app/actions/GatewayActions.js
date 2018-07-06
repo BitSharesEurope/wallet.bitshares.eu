@@ -23,7 +23,6 @@ class GatewayActions {
         urlBridge = undefined,
         urlWallets = undefined
     } = {}) {
-        return {};
         if (!inProgress["fetchCoins_" + backer]) {
             inProgress["fetchCoins_" + backer] = true;
             return dispatch => {
@@ -103,7 +102,6 @@ class GatewayActions {
     }
 
     fetchPairs() {
-        return {};
         if (!inProgress["fetchTradingPairs"]) {
             inProgress["fetchTradingPairs"] = true;
             return dispatch => {

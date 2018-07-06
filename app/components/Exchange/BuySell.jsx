@@ -461,7 +461,6 @@ class BuySell extends React.Component {
                                 </a>
                             </div>
                         ) : null}
-                        {/*
                         {this.props.backedCoin ? (
                             <div className="float-right buy-sell-deposit">
                                 <a onClick={this._onDeposit.bind(this)}>
@@ -486,7 +485,6 @@ class BuySell extends React.Component {
                                 </a>
                             </div>
                         ) : null}
-                       */}
                         {this.props.onBorrow ? (
                             <div className="float-right buy-sell-deposit">
                                 <a onClick={this.props.onBorrow}>

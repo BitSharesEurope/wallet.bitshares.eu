@@ -51,7 +51,17 @@ class AccountOverview extends React.Component {
             depositAsset: null,
             withdrawAsset: null,
             bridgeAsset: null,
-            alwaysShowAssets: ["BTS", "USD", "CNY"]
+            alwaysShowAssets: [
+                "BTS"
+                // "USD",
+                // "CNY",
+                // "OPEN.BTC",
+                // "OPEN.USDT",
+                // "OPEN.ETH",
+                // "OPEN.MAID",
+                // "OPEN.STEEM",
+                // "OPEN.DASH"
+            ]
         };
 
         this.qtyRefs = {};
@@ -333,7 +343,7 @@ class AccountOverview extends React.Component {
                 asset.getIn(["options", "description"])
             );
             symbol = asset.get("symbol");
-            if (!market) market = "USD";
+            if (symbol.indexOf("OPEN.") !== -1 && !market) market = "USD";
             let preferredMarket = market ? market : preferredUnit;
 
             if (notCore && preferredMarket === symbol)
@@ -393,18 +403,14 @@ class AccountOverview extends React.Component {
                 asset.get("symbol"),
                 this.props.backedCoins
             );
-            const canDeposit = false;
-            /*
+            const canDeposit =
                 (backedCoin && backedCoin.depositAllowed) ||
                 asset.get("symbol") == "BTS";
-            */
 
-            const canWithdraw = false;
-            /*
+            const canWithdraw =
                 backedCoin &&
                 backedCoin.withdrawalAllowed &&
                 (hasBalance && balanceObject.get("balance") != 0);
-            */
             const canBuy = !!this.props.bridgeCoins.get(symbol);
 
             const assetAmount = balanceObject.get("balance");
