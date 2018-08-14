@@ -11,7 +11,7 @@ import counterpart from "counterpart";
 import TransactionConfirmStore from "stores/TransactionConfirmStore";
 import {RecentTransactions} from "../Account/RecentTransactions";
 import Immutable from "immutable";
-import {ChainStore} from "bitsharesjs/es";
+import {ChainStore} from "bitsharesjs";
 import {connect} from "alt-react";
 import {
     checkFeeStatusAsync,
@@ -427,9 +427,11 @@ class Transfer extends React.Component {
             from_error = (
                 <span>
                     {counterpart.translate("account.errors.not_yours")}
-                    &nbsp;(<a onClick={this.onPropose.bind(this, true)}>
+                    &nbsp;(
+                    <a onClick={this.onPropose.bind(this, true)}>
                         {counterpart.translate("propose")}
-                    </a>)
+                    </a>
+                    )
                 </span>
             );
         }
@@ -463,7 +465,8 @@ class Transfer extends React.Component {
                         <Translate
                             component="span"
                             content="transfer.available"
-                        />:{" "}
+                        />
+                        :{" "}
                         <BalanceComponent
                             balance={account_balances[current_asset_id]}
                         />

@@ -20,17 +20,17 @@ cache:
   directories:
     - "node_modules"
 addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-4.8
-    - g++-4.8
-    - icnsutils
-    - graphicsmagick
-    - xz-utils
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - gcc-4.8
+            - g++-4.8
+            - icnsutils
+            - graphicsmagick
+            - xz-utils
 install:
-  - npm install -g npm@6
-  - npm ci
+    - npm install -g npm@6
+    - npm ci
 script: "./build.sh"
 after_success: "./deploy.sh"

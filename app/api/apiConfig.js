@@ -1,3 +1,5 @@
+import {getFaucet} from "../branding";
+
 export const blockTradesAPIs = {
     BASE: "https://api.blocktrades.us/v2",
     COINS_LIST: "/coins",
@@ -65,6 +67,34 @@ export const gdexAPIs = {
     WITHDRAW_RULE: "/gateway/withdraw/rule"
 };
 
+export const nodeRegions = [
+    // region of the node follows roughly https://en.wikipedia.org/wiki/Subregion#/media/File:United_Nations_geographical_subregions.png
+    "Northern Europe",
+    "Western Europe",
+    "Southern Europe",
+    "Eastern Europe",
+    "Northern Asia",
+    "Western Asia",
+    "Southern Asia",
+    "Eastern Asia",
+    "Central Asia",
+    "Southeastern Asia",
+    "Australia",
+    "New Zealand",
+    "Melanesia",
+    "Polynesia",
+    "Micronesia",
+    "Northern Africa",
+    "Western Africa",
+    "Middle Africa",
+    "Eastern Africa",
+    "Southern Africa",
+    "Northern America",
+    "Central America",
+    "Caribbean",
+    "South America"
+];
+
 export const settingsAPIs = {
     DEFAULT_WS_NODE: "wss://node.bitshares.eu",
     WS_NODE_LIST: [
@@ -72,18 +102,38 @@ export const settingsAPIs = {
         // Testnet
         {
             url: "wss://node.testnet.bitshares.eu",
-            location: "TESTNET - BitShares Europe (Frankfurt, Germany)"
+            region: "TESTNET - Western Europe",
+            country: "Germany",
+            location: "Frankfurt",
+            operator: "BitShares Europe",
+            contact: "telegram:xeroc"
         },
         {
             url: "wss://testnet.nodes.bitshares.ws",
-            location: "TESTNET - BitShares Infrastructure Program"
+            region: "TESTNET - Western Europe",
+            country: "Germany",
+            location: "Nuremberg",
+            operator: "Infrastructure Worker",
+            contact: "email:info@blockchainprojectsbv.com"
         },
         {
             url: "wss://testnet.bitshares.apasia.tech/ws",
-            location: "TESTNET - APT BitShares (Dallas, USA)"
+            region: "TESTNET - Northern America",
+            country: "U.S.A.",
+            location: "Dallas",
+            operator: "APAsia",
+            contact: "telegram:murda_ra"
+        },
+        {
+            url: "wss://testnet.dex.trading/",
+            region: "TESTNET - Western Europe",
+            country: "France",
+            location: "Paris",
+            operator: "Witness: zapata42-witness",
+            contact: "telegram:Zapata_42"
         }
     ],
-    DEFAULT_FAUCET: "https://faucet.bitshares.eu",
+    DEFAULT_FAUCET: getFaucet().url,
     TESTNET_FAUCET: "https://faucet.testnet.bitshares.eu",
     RPC_URL: "https://openledger.info/api/"
 };

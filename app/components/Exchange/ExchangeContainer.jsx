@@ -8,7 +8,7 @@ import WalletUnlockStore from "stores/WalletUnlockStore";
 import AltContainer from "alt-container";
 import Exchange from "./Exchange";
 import ChainTypes from "../Utility/ChainTypes";
-import {EmitterInstance} from "bitsharesjs/es";
+import {EmitterInstance} from "bitsharesjs";
 import BindToChainState from "../Utility/BindToChainState";
 import MarketsActions from "actions/MarketsActions";
 import {DataFeed} from "components/Exchange/tradingViewClasses";
@@ -109,7 +109,15 @@ class ExchangeContainer extends React.Component {
                             true
                         );
                     },
-                    dataFeed: () => new DataFeed()
+
+                    dataFeed: () => new DataFeed(),
+
+                    trackedGroupsConfig: () => {
+                        return MarketsStore.getState().trackedGroupsConfig;
+                    },
+                    currentGroupOrderLimit: () => {
+                        return MarketsStore.getState().currentGroupLimit;
+                    }
                 }}
             >
                 <ExchangeSubscriber
@@ -261,16 +269,20 @@ class ExchangeSubscriber extends React.Component {
         }
     }
 
-    _subToMarket(props, newBucketSize) {
-        let {quoteAsset, baseAsset, bucketSize} = props;
+    _subToMarket(props, newBucketSize, newGroupLimit) {
+        let {quoteAsset, baseAsset, bucketSize, currentGroupOrderLimit} = props;
         if (newBucketSize) {
             bucketSize = newBucketSize;
+        }
+        if (newGroupLimit) {
+            currentGroupOrderLimit = newGroupLimit;
         }
         if (quoteAsset.get("id") && baseAsset.get("id")) {
             MarketsActions.subscribeMarket.defer(
                 baseAsset,
                 quoteAsset,
-                bucketSize
+                bucketSize,
+                currentGroupOrderLimit
             );
             this.setState({
                 sub: `${quoteAsset.get("id")}_${baseAsset.get("id")}`
