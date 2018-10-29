@@ -1,5 +1,5 @@
-import {Fraction} from "fractional";
 import utils from "./utils";
+import {BigNumber} from "bignumber.js";
 
 const GRAPHENE_100_PERCENT = 10000;
 
@@ -134,7 +134,7 @@ class Asset {
         // asset amount times a price p
         let temp, amount;
         if (this.asset_id === p.base.asset_id) {
-            temp = this.amount * p.quote.amount / p.base.amount;
+            temp = (this.amount * p.quote.amount) / p.base.amount;
             amount = Math.floor(temp);
             /*
             * Sometimes prices are inexact for the relevant amounts, in the case
@@ -151,7 +151,7 @@ class Asset {
                 precision: p.quote.precision
             });
         } else if (this.asset_id === p.quote.asset_id) {
-            temp = this.amount * p.base.amount / p.quote.amount;
+            temp = (this.amount * p.base.amount) / p.quote.amount;
             amount = Math.floor(temp);
             /*
             * Sometimes prices are inexact for the relevant amounts, in the case
@@ -235,10 +235,11 @@ class Price {
             * larger than 100k do not need more than 5 decimals. Without this we
             * quickly encounter JavaScript floating point errors for large numbers.
             */
+
             if (real > 100000) {
                 real = limitByPrecision(real, 5);
             }
-            let frac = new Fraction(real);
+            let frac = new BigNumber(real.toString()).toFraction();
             let baseSats = base.toSats(),
                 quoteSats = quote.toSats();
             let numRatio = baseSats / quoteSats,
@@ -250,8 +251,8 @@ class Price {
                 numRatio = 1;
             }
 
-            base.setAmount({sats: frac.numerator * numRatio});
-            quote.setAmount({sats: frac.denominator * denRatio});
+            base.setAmount({sats: frac[0] * numRatio});
+            quote.setAmount({sats: frac[1] * denRatio});
         } else if (real === 0) {
             base.setAmount({sats: 0});
             quote.setAmount({sats: 0});
@@ -277,11 +278,9 @@ class Price {
             return this[key];
         }
         let real = sameBase
-            ? this.quote.amount *
-              this.base.toSats() /
+            ? (this.quote.amount * this.base.toSats()) /
               (this.base.amount * this.quote.toSats())
-            : this.base.amount *
-              this.quote.toSats() /
+            : (this.base.amount * this.quote.toSats()) /
               (this.quote.amount * this.base.toSats());
         return (this[key] = parseFloat(real.toFixed(8))); // toFixed and parseFloat helps avoid floating point errors for really big or small numbers
     }

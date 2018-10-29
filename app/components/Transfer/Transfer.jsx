@@ -9,6 +9,7 @@ import AmountSelector from "../Utility/AmountSelector";
 import utils from "common/utils";
 import counterpart from "counterpart";
 import TransactionConfirmStore from "stores/TransactionConfirmStore";
+import TranslateWithLinks from "../Utility/TranslateWithLinks";
 import {RecentTransactions} from "../Account/RecentTransactions";
 import Immutable from "immutable";
 import {ChainStore} from "bitsharesjs";
@@ -22,6 +23,7 @@ import {debounce, isNaN} from "lodash-es";
 import classnames from "classnames";
 import {Asset} from "common/MarketClasses";
 import queryString from "query-string";
+import SendModal from "../Modal/SendModal";
 
 class Transfer extends React.Component {
     constructor(props) {
@@ -154,7 +156,7 @@ class Transfer extends React.Component {
     }
 
     _checkFeeStatus(account = this.state.from_account) {
-        if (!account) return;
+        if (!account || !account.get("balances")) return;
 
         const assets = Object.keys(account.get("balances").toJS()).sort(
             utils.sortID
@@ -502,6 +504,38 @@ class Transfer extends React.Component {
                     className="grid-block shrink vertical medium-horizontal"
                     style={{paddingTop: "2rem"}}
                 >
+                    <div className="grid-content small-12 medium-12 large-10 large-offset-1 full-width-content">
+                        <SendModal
+                            id="send_modal_header"
+                            refCallback={e => {
+                                if (e) this.send_modal = e;
+                            }}
+                            from_name={this.props.currentAccount}
+                        />
+                        <TranslateWithLinks
+                            string="transfer.phase_out_warning"
+                            keys={[
+                                {
+                                    arg: "modal_link",
+                                    value: (
+                                        <a
+                                            onClick={() => {
+                                                if (this.send_modal)
+                                                    this.send_modal.show();
+                                            }}
+                                        >
+                                            <Translate content="header.payments" />
+                                        </a>
+                                    )
+                                }
+                            ]}
+                        />
+                    </div>
+                </div>
+                <div
+                    className="grid-block shrink vertical medium-horizontal"
+                    style={{paddingTop: "1rem"}}
+                >
                     <form
                         style={{paddingBottom: 20, overflow: "visible"}}
                         className="grid-content small-12 medium-6 large-5 large-offset-1 full-width-content"
@@ -732,15 +766,18 @@ class Transfer extends React.Component {
     }
 }
 
-export default connect(Transfer, {
-    listenTo() {
-        return [AccountStore];
-    },
-    getProps() {
-        return {
-            currentAccount: AccountStore.getState().currentAccount,
-            passwordAccount: AccountStore.getState().passwordAccount,
-            contactsList: AccountStore.getState().accountContacts
-        };
+export default connect(
+    Transfer,
+    {
+        listenTo() {
+            return [AccountStore];
+        },
+        getProps() {
+            return {
+                currentAccount: AccountStore.getState().currentAccount,
+                passwordAccount: AccountStore.getState().passwordAccount,
+                contactsList: AccountStore.getState().accountContacts
+            };
+        }
     }
-});
+);

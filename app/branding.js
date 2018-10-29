@@ -86,7 +86,33 @@ export function getMyMarketsBases() {
  * @returns {[string]}
  */
 export function getMyMarketsQuotes() {
-    return ["BTS", "BTC", "USD", "CNY", "EUR", "GOLD", "SILVER", "RUB", "PPY"];
+    let tokens = {
+        nativeTokens: [
+            "BTC",
+            "BTS",
+            "CNY",
+            "EUR",
+            "GOLD",
+            "KRW",
+            "RUBLE",
+            "SILVER",
+            "USD"
+        ],
+        bridgeTokens: [],
+        gdexTokens: [],
+        openledgerTokens: [],
+        rudexTokens: [],
+        sparkTokens: [],
+        winTokens: [],
+        xbtsxTokens: [],
+        otherTokens: []
+    };
+
+    let allTokens = [];
+    for (let type in tokens) {
+        allTokens = allTokens.concat(tokens[type]);
+    }
+    return allTokens;
 }
 
 /**
@@ -94,7 +120,7 @@ export function getMyMarketsQuotes() {
  *
  * @returns {list of string tuples}
  */
-export function getFeaturedMarkets() {
+export function getFeaturedMarkets(quotes = []) {
     return [
         ["USD", "BTS"],
         ["USD", "OPEN.BTC"],
@@ -163,9 +189,14 @@ export function getFeaturedMarkets() {
         ["BTS", "RUDEX.SCR"],
         ["BTS", "RUDEX.ETH"],
         ["BTS", "RUDEX.DGB"],
+        ["BTS", "XBTSX.STH"],
         ["BTS", "ZEPH"],
-        ["BTS", "HERTZ"]
-    ];
+        ["BTS", "HERTZ"][("BTS", "SPARKDEX.BTC")],
+        ["BTS", "SPARKDEX.ETH"]
+    ].filter(a => {
+        if (!quotes.length) return true;
+        return quotes.indexOf(a[0]) !== -1;
+    });
 }
 
 /**
@@ -174,7 +205,17 @@ export function getFeaturedMarkets() {
  * @returns {[string,string,string,string,string,string,string]}
  */
 export function getAssetNamespaces() {
-    return ["TRADE.", "OPEN.", "METAEX.", "BRIDGE.", "RUDEX.", "GDEX.", "WIN."];
+    return [
+        "TRADE.",
+        "OPEN.",
+        "METAEX.",
+        "BRIDGE.",
+        "RUDEX.",
+        "GDEX.",
+        "WIN.",
+        "XBTSX.",
+        "SPARKDEX."
+    ];
 }
 
 /**
@@ -193,7 +234,11 @@ export function getAssetHideNamespaces() {
  */
 export function allowedGateway(gateway) {
     return false;
-    //return ["OPEN", "RUDEX", "WIN", "BRIDGE", "GDEX"].indexOf(gateway) >= 0;
+    return (
+        ["OPEN", "RUDEX", "WIN", "BRIDGE", "GDEX", "XBTSX", "SPARKDEX"].indexOf(
+            gateway
+        ) >= 0
+    );
 }
 
 export function getSupportedLanguages() {

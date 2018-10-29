@@ -26,6 +26,15 @@ require("./operations.scss");
 let ops = Object.keys(operations);
 let listings = account_constants.account_listing;
 
+const ShortObjectId = ({objectId}) => {
+    if (typeof objectId === "string") {
+        const parts = objectId.split(".");
+        const {length} = parts;
+        if (length > 0) return "#" + parts[length - 1];
+    }
+    return objectId;
+};
+
 class TransactionLabel extends React.Component {
     shouldComponentUpdate(nextProps) {
         return (
@@ -122,13 +131,14 @@ class Row extends React.Component {
                         </Link>
                     </td>
                 )}
+
                 <td style={{padding: "8px 5px", textAlign: "left"}}>
                     <div>
                         <span>{this.props.info}</span>
                     </div>
                     <div style={{fontSize: 14, paddingTop: 5}}>
                         {/*<span>{counterpart.translate("explorer.block.title").toLowerCase()} <Link to={`/block/${block}`}>{utils.format_number(block, 0)}</Link></span>*/}
-                        {!this.props.hideFee ? (
+                        {/*{!this.props.hideFee ? (
                             <span className="facolor-fee">
                                 {" "}
                                 -{" "}
@@ -137,10 +147,18 @@ class Row extends React.Component {
                                     asset={fee.asset_id}
                                 />
                             </span>
-                        ) : null}
+                        ) : null}*/}
                         {pending ? <span> - {pending}</span> : null}
                     </div>
                 </td>
+                {!this.props.hideFee && (
+                    <td style={{textAlign: "left"}}>
+                        <FormattedAsset
+                            amount={fee.amount}
+                            asset={fee.asset_id}
+                        />
+                    </td>
+                )}
                 <td>
                     {!this.props.hideDate ? (
                         <BlockTime
@@ -663,25 +681,65 @@ class Operation extends React.Component {
 
             case "asset_settle":
                 color = "warning";
-                column = (
-                    <span>
-                        <TranslateWithLinks
-                            string="operation.asset_settle"
-                            keys={[
-                                {
-                                    type: "account",
-                                    value: op[1].account,
-                                    arg: "account"
-                                },
-                                {
-                                    type: "amount",
-                                    value: op[1].amount,
-                                    arg: "amount"
-                                }
-                            ]}
-                        />
-                    </span>
-                );
+
+                const baseAmount = op[1].amount;
+                const {
+                    result: [resultCode, quoteAmount]
+                } = this.props;
+                const instantSettleCode = 2;
+
+                switch (resultCode) {
+                    case instantSettleCode:
+                        column = (
+                            <span>
+                                <TranslateWithLinks
+                                    string="operation.asset_settle_instant"
+                                    keys={[
+                                        {
+                                            type: "account",
+                                            value: op[1].account,
+                                            arg: "account"
+                                        },
+                                        {
+                                            type: "amount",
+                                            value: baseAmount,
+                                            arg: "amount"
+                                        },
+                                        {
+                                            type: "price",
+                                            value: {
+                                                base: baseAmount,
+                                                quote: quoteAmount
+                                            },
+                                            arg: "price"
+                                        }
+                                    ]}
+                                />
+                            </span>
+                        );
+                        break;
+                    default:
+                        column = (
+                            <span>
+                                <TranslateWithLinks
+                                    string="operation.asset_settle"
+                                    keys={[
+                                        {
+                                            type: "account",
+                                            value: op[1].account,
+                                            arg: "account"
+                                        },
+                                        {
+                                            type: "amount",
+                                            value: op[1].amount,
+                                            arg: "amount"
+                                        }
+                                    ]}
+                                />
+                            </span>
+                        );
+                }
+
                 break;
 
             case "asset_global_settle":
@@ -827,6 +885,16 @@ class Operation extends React.Component {
                                         type: "account",
                                         value: op[1].fee_paying_account,
                                         arg: "account"
+                                    },
+                                    {
+                                        value: this.props.result ? (
+                                            <ShortObjectId
+                                                objectId={this.props.result[1]}
+                                            />
+                                        ) : (
+                                            ""
+                                        ),
+                                        arg: "proposal"
                                     }
                                 ]}
                             />
@@ -853,28 +921,88 @@ class Operation extends React.Component {
                 break;
 
             case "proposal_update":
+                const fields = [
+                    "active_approvals_to_add",
+                    "active_approvals_to_remove",
+                    "owner_approvals_to_add",
+                    "owner_approvals_to_remove",
+                    "key_approvals_to_add",
+                    "key_approvals_to_remove"
+                ];
                 column = (
-                    <span>
-                        <TranslateWithLinks
-                            string="operation.proposal_update"
-                            keys={[
-                                {
-                                    type: "account",
-                                    value: op[1].fee_paying_account,
-                                    arg: "account"
-                                }
-                            ]}
-                        />
-                    </span>
+                    <div>
+                        <span>
+                            <TranslateWithLinks
+                                string="operation.proposal_update"
+                                keys={[
+                                    {
+                                        type: "account",
+                                        value: op[1].fee_paying_account,
+                                        arg: "account"
+                                    },
+                                    {
+                                        value: (
+                                            <ShortObjectId
+                                                objectId={op[1].proposal}
+                                            />
+                                        ),
+                                        arg: "proposal"
+                                    }
+                                ]}
+                            />
+                        </span>
+                        <div className="proposal-update">
+                            {fields.map(field => {
+                                if (op[1][field].length) {
+                                    return (
+                                        <div key={field}>
+                                            <Translate
+                                                content={`proposal.updated.${field}`}
+                                            />
+                                            <ul>
+                                                {op[1][field].map(value => {
+                                                    return (
+                                                        <li key={value}>
+                                                            {field.startsWith(
+                                                                "key"
+                                                            )
+                                                                ? value
+                                                                : this.linkToAccount(
+                                                                      value
+                                                                  )}
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                        </div>
+                                    );
+                                } else return null;
+                            })}
+                        </div>
+                    </div>
                 );
                 break;
 
             case "proposal_delete":
                 column = (
                     <span>
-                        <Translate
-                            component="span"
-                            content="transaction.proposal_delete"
+                        <TranslateWithLinks
+                            string="operation.proposal_delete"
+                            keys={[
+                                {
+                                    type: "account",
+                                    value: op[1].fee_paying_account,
+                                    arg: "account"
+                                },
+                                {
+                                    value: (
+                                        <ShortObjectId
+                                            objectId={op[1].proposal}
+                                        />
+                                    ),
+                                    arg: "proposal"
+                                }
+                            ]}
                         />
                     </span>
                 );
@@ -1427,15 +1555,18 @@ class Operation extends React.Component {
     }
 }
 
-Operation = connect(Operation, {
-    listenTo() {
-        return [SettingsStore];
-    },
-    getProps() {
-        return {
-            marketDirections: SettingsStore.getState().marketDirections
-        };
+Operation = connect(
+    Operation,
+    {
+        listenTo() {
+            return [SettingsStore];
+        },
+        getProps() {
+            return {
+                marketDirections: SettingsStore.getState().marketDirections
+            };
+        }
     }
-});
+);
 
 export default Operation;

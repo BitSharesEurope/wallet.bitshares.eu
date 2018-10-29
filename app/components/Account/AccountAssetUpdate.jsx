@@ -21,13 +21,21 @@ import {BitAssetOptions} from "./AccountAssetCreate";
 import assetConstants from "chain/asset_constants";
 import AssetWhitelist from "./AssetWhitelist";
 import AssetFeedProducers from "./AssetFeedProducers";
-import BaseModal from "components/Modal/BaseModal";
 import ZfApi from "react-foundation-apps/src/utils/foundation-api";
 import {withRouter} from "react-router-dom";
+import {Modal, Button, Notification, Switch} from "bitshares-ui-style-guide";
 
 let GRAPHENE_MAX_SHARE_SUPPLY = new big(
     assetConstants.GRAPHENE_MAX_SHARE_SUPPLY
 );
+
+const disabledBackingAssetChangeCallback = () => {
+    Notification.error({
+        message: counterpart.translate(
+            "account.user_issued_assets.invalid_backing_asset_change"
+        )
+    });
+};
 
 class AccountAssetUpdate extends React.Component {
     static propTypes = {
@@ -42,14 +50,21 @@ class AccountAssetUpdate extends React.Component {
         super(props);
 
         this.state = this.resetState(props);
+
+        this.showAssetUpdateConfirmationModal = this.showAssetUpdateConfirmationModal.bind(
+            this
+        );
+        this.hideAssetUpdateConfirmationModal = this.hideAssetUpdateConfirmationModal.bind(
+            this
+        );
     }
 
     _openConfirm() {
-        this.refs.confirm_modal.show();
+        this.showAssetUpdateConfirmationModal();
     }
 
     _cancelConfirm() {
-        this.refs.confirm_modal.onClose();
+        this.hideAssetUpdateConfirmationModal();
     }
 
     resetState(props) {
@@ -103,6 +118,7 @@ class AccountAssetUpdate extends React.Component {
         ).get("symbol");
 
         return {
+            isAssetUpdateConfirmationModalVisible: false,
             update: {
                 max_supply: max_supply,
                 max_market_fee: max_market_fee,
@@ -166,6 +182,18 @@ class AccountAssetUpdate extends React.Component {
                   })
                 : null
         };
+    }
+
+    hideAssetUpdateConfirmationModal() {
+        this.setState({
+            isAssetUpdateConfirmationModalVisible: false
+        });
+    }
+
+    showAssetUpdateConfirmationModal() {
+        this.setState({
+            isAssetUpdateConfirmationModalVisible: true
+        });
     }
 
     // Using JSON.stringify for (fast?) comparsion, could be improved, but seems enough here as the order is fixed
@@ -291,7 +319,7 @@ class AccountAssetUpdate extends React.Component {
         e.preventDefault();
 
         // Close confirm_modal if it's open
-        this.refs.confirm_modal.onClose();
+        this.hideAssetUpdateConfirmationModal();
 
         let {
             update,
@@ -446,8 +474,11 @@ class AccountAssetUpdate extends React.Component {
                 bitasset_opts[value] = e;
                 break;
 
-            default:
+            case "minimum_feeds":
                 bitasset_opts[value] = parseInt(e.target.value, 10);
+                break;
+
+            default:
                 break;
         }
 
@@ -683,8 +714,35 @@ class AccountAssetUpdate extends React.Component {
         this._validateEditFields({});
     }
 
+    _getCurrentSupply() {
+        const {asset, getDynamicObject} = this.props;
+
+        return (
+            getDynamicObject &&
+            getDynamicObject(asset.get("dynamic_asset_data_id")).get(
+                "current_supply"
+            )
+        );
+    }
+
     _onPermissionChange(key) {
-        let booleans = this.state.permissionBooleans;
+        const {isBitAsset, permissionBooleans} = this.state;
+
+        const disabled = !assetUtils.getFlagBooleans(
+            this.props.asset.getIn(["options", "issuer_permissions"]),
+            isBitAsset
+        )[key];
+
+        if (this._getCurrentSupply() > 0 && disabled) {
+            Notification.error({
+                message: counterpart.translate(
+                    "account.user_issued_assets.invalid_permissions_change"
+                )
+            });
+            return;
+        }
+
+        let booleans = permissionBooleans;
         booleans[key] = !booleans[key];
         this.setState({
             permissionBooleans: booleans
@@ -773,17 +831,10 @@ class AccountAssetUpdate extends React.Component {
                                 :
                             </td>
                             <td style={{border: "none"}}>
-                                <div
-                                    className="switch"
-                                    style={{marginBottom: "10px"}}
-                                    onClick={onClick}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={isChecked}
-                                    />
-                                    <label />
-                                </div>
+                                <Switch
+                                    checked={isChecked}
+                                    onChange={onClick}
+                                />
                             </td>
                         </tr>
                     </tbody>
@@ -830,21 +881,13 @@ class AccountAssetUpdate extends React.Component {
                                     :
                                 </td>
                                 <td style={{border: "none"}}>
-                                    <div
-                                        className="switch"
-                                        style={{marginBottom: "10px"}}
-                                        onClick={this._onPermissionChange.bind(
+                                    <Switch
+                                        checked={permissionBooleans[key]}
+                                        onChange={this._onPermissionChange.bind(
                                             this,
                                             key
                                         )}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={permissionBooleans[key]}
-                                            onChange={() => {}}
-                                        />
-                                        <label />
-                                    </div>
+                                    />
                                 </td>
                             </tr>
                         </tbody>
@@ -1304,6 +1347,12 @@ class AccountAssetUpdate extends React.Component {
                                                 "precision"
                                             )}
                                             assetSymbol={asset.get("symbol")}
+                                            disableBackingAssetChange={
+                                                this._getCurrentSupply() > 0
+                                            }
+                                            disabledBackingAssetChangeCallback={
+                                                disabledBackingAssetChangeCallback
+                                            }
                                         />
                                         {
                                             <p>
@@ -1371,26 +1420,15 @@ class AccountAssetUpdate extends React.Component {
                                                                 border: "none"
                                                             }}
                                                         >
-                                                            <div
-                                                                className="switch"
-                                                                style={{
-                                                                    marginBottom:
-                                                                        "10px"
-                                                                }}
-                                                                onClick={this._onFlagChange.bind(
+                                                            <Switch
+                                                                checked={
+                                                                    flagBooleans.charge_market_fee
+                                                                }
+                                                                onChange={this._onFlagChange.bind(
                                                                     this,
                                                                     "charge_market_fee"
                                                                 )}
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    onChange={() => {}}
-                                                                    checked={
-                                                                        flagBooleans.charge_market_fee
-                                                                    }
-                                                                />
-                                                                <label />
-                                                            </div>
+                                                            />
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -1494,8 +1532,9 @@ class AccountAssetUpdate extends React.Component {
                 </div>
                 {/* Confirmation Modal on Multiple Changes */}
                 <ConfirmModal
-                    modalId="asset_update_modal"
-                    ref="confirm_modal"
+                    visible={this.state.isAssetUpdateConfirmationModalVisible}
+                    hideModal={this.hideAssetUpdateConfirmationModal}
+                    showModal={this.showAssetUpdateConfirmationModal}
                     tabsChanged={this.tabsChanged()}
                     _cancelConfirm={this._cancelConfirm.bind(this)}
                     _updateAsset={this._updateAsset.bind(this)}
@@ -1533,12 +1572,27 @@ class ConfirmModal extends React.Component {
     render() {
         let {tabsChanged} = this.props;
 
-        return !this.state.open ? null : (
-            <BaseModal
-                id={this.props.modalId}
-                overlay={true}
-                modalHeader="account.confirm_asset_modal.header"
-                noLogo
+        const footer = [
+            <Button
+                type="primary"
+                key="submit"
+                onClick={this.props._updateAsset}
+            >
+                {counterpart.translate("global.confirm")}
+            </Button>,
+            <Button key="cancel" onClick={this.props.hideModal}>
+                {counterpart.translate("global.cancel")}
+            </Button>
+        ];
+
+        return (
+            <Modal
+                visible={this.props.visible}
+                footer={footer}
+                onCancel={this.props.hideModal}
+                title={counterpart.translate(
+                    "account.confirm_asset_modal.header"
+                )}
             >
                 <Translate
                     content="account.confirm_asset_modal.are_you_sure"
@@ -1587,21 +1641,7 @@ class ConfirmModal extends React.Component {
                         ) : null}
                     </ul>
                 </div>
-                <div>
-                    <button
-                        className="button primary"
-                        onClick={this.props._updateAsset.bind(this)}
-                    >
-                        <Translate content="global.confirm" />
-                    </button>
-                    <button
-                        className="button primary hollow"
-                        onClick={this.props._cancelConfirm.bind(this)}
-                    >
-                        <Translate content="global.cancel" />
-                    </button>
-                </div>
-            </BaseModal>
+            </Modal>
         );
     }
 }

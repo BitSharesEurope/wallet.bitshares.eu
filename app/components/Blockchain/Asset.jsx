@@ -610,7 +610,7 @@ class Asset extends React.Component {
                         content="explorer.asset.feed_producer_text"
                     />
                     <AssetPublishFeed
-                        base={asset.id}
+                        asset={asset.id}
                         account={this.props.currentAccount}
                         currentOwner={asset.issuer}
                     />
@@ -818,39 +818,6 @@ class Asset extends React.Component {
     // 's collateral no longer enough to back the debt
     // he/she owes. If the feed price goes above this,
     // then
-    getGlobalSettlementPriceFromSorted(sortedCallOrders) {
-        console.log("global settlement sorted called");
-        // first get the least collateralized short position
-        if (!sortedCallOrders || sortedCallOrders.length <= 0) {
-            console.log("length array 0 passed in");
-            return null;
-        }
-        console.log("sortedCallOrders exists according to sorted get globa");
-
-        let leastColShort = sortedCallOrders[0];
-
-        // this price will happen when the CR is 1.
-        // The CR is 1 iff collateral / (debt x feed_ price) == 1
-        // Rearranging, this means that the CR is 1 iff
-        // feed_price == collateral / debt
-        let debt = leastColShort.amountToReceive().getAmount();
-        let collateral = leastColShort.getCollateral().getAmount();
-
-        return (
-            <FormattedPrice
-                base_amount={collateral}
-                base_asset={leastColShort.call_price.base.asset_id}
-                quote_amount={debt}
-                quote_asset={leastColShort.call_price.quote.asset_id}
-            />
-        );
-    }
-
-    // the global settlement price is defined as the
-    // the price at which the least collateralized short
-    // 's collateral no longer enough to back the debt
-    // he/she owes. If the feed price goes above this,
-    // then
     getGlobalSettlementPrice() {
         if (!this.state.callOrders) {
             return null;
@@ -881,8 +848,8 @@ class Asset extends React.Component {
         // The CR is 1 iff collateral / (debt x feed_ price) == 1
         // Rearranging, this means that the CR is 1 iff
         // feed_price == collateral / debt
-        let debt = leastColShort.amountToReceive().getAmount();
-        let collateral = leastColShort.getCollateral().getAmount();
+        let debt = leastColShort.debt;
+        let collateral = leastColShort.collateral;
 
         return (
             <FormattedPrice
@@ -1286,18 +1253,21 @@ class Asset extends React.Component {
     }
 }
 
-Asset = connect(Asset, {
-    listenTo() {
-        return [AccountStore];
-    },
-    getProps() {
-        return {
-            currentAccount:
-                AccountStore.getState().currentAccount ||
-                AccountStore.getState().passwordAccount
-        };
+Asset = connect(
+    Asset,
+    {
+        listenTo() {
+            return [AccountStore];
+        },
+        getProps() {
+            return {
+                currentAccount:
+                    AccountStore.getState().currentAccount ||
+                    AccountStore.getState().passwordAccount
+            };
+        }
     }
-});
+);
 
 Asset = AssetWrapper(Asset, {
     propNames: ["backingAsset"]

@@ -17,13 +17,24 @@ export const openledgerAPIs = {
     TRADING_PAIRS: "/trading-pairs",
     DEPOSIT_LIMIT: "/deposit-limits",
     ESTIMATE_OUTPUT: "/estimate-output-amount",
-    ESTIMATE_INPUT: "/estimate-input-amount"
+    ESTIMATE_INPUT: "/estimate-input-amount",
+    RPC_URL: "https://openledger.info/api/"
 };
 
 export const rudexAPIs = {
     BASE: "https://gateway.rudex.org/api/v0_1",
     COINS_LIST: "/coins",
     NEW_DEPOSIT_ADDRESS: "/new-deposit-address"
+};
+
+export const bitsparkAPIs = {
+    BASE: "https://dex-api.bitspark.io/api/v1",
+    COINS_LIST: "/coins",
+    ACTIVE_WALLETS: "/active-wallets",
+    TRADING_PAIRS: "/trading-pairs",
+    DEPOSIT_LIMIT: "/deposit-limits",
+    ESTIMATE_OUTPUT: "/estimate-output-amount",
+    ESTIMATE_INPUT: "/estimate-input-amount"
 };
 
 export const cryptoBridgeAPIs = {
@@ -42,6 +53,16 @@ export const widechainAPIs = {
     WITHDRAW_HISTORY: "/latelyWithdraw",
     TRADING_PAIRS: "/trading-pairs",
     DEPOSIT_HISTORY: "/latelyRecharge"
+};
+
+export const citadelAPIs = {
+    BASE: "https://citadel.li/trade",
+    COINS_LIST: "/coins",
+    ACTIVE_WALLETS: "/active-wallets",
+    TRADING_PAIRS: "/trading-pairs",
+    DEPOSIT_LIMIT: "/deposit-limits",
+    ESTIMATE_OUTPUT: "/estimate-output-amount",
+    ESTIMATE_INPUT: "/estimate-input-amount"
 };
 
 export const gdex2APIs = {
@@ -65,6 +86,11 @@ export const gdexAPIs = {
     GET_USER_INFO: "/gateway/user/getUserInfo",
     USER_AGREEMENT: "/gateway/user/isAgree",
     WITHDRAW_RULE: "/gateway/withdraw/rule"
+};
+
+export const xbtsxAPIs = {
+    BASE: "https://apis.xbts.io/api/v1",
+    COINS_LIST: "/coin"
 };
 
 export const nodeRegions = [
@@ -98,6 +124,10 @@ export const nodeRegions = [
 export const settingsAPIs = {
     DEFAULT_WS_NODE: "wss://node.bitshares.eu",
     WS_NODE_LIST: [
+        {
+            url: "wss://fake.automatic-selection.com",
+            location: {translate: "settings.api_closest"}
+        },
         {url: "wss://node.bitshares.eu", location: "Nuremberg, Germany"},
         // Testnet
         {
@@ -121,7 +151,15 @@ export const settingsAPIs = {
             region: "TESTNET - Northern America",
             country: "U.S.A.",
             location: "Dallas",
-            operator: "APAsia",
+            operator: "Flash Infrastructure Worker",
+            contact: "telegram:murda_ra"
+        },
+        {
+            url: "wss://testnet-eu.bitshares.apasia.tech/ws",
+            region: "TESTNET - Northern Europe",
+            country: "Netherlands",
+            location: "Amsterdam",
+            operator: "Flash Infrastructure Worker",
             contact: "telegram:murda_ra"
         },
         {
@@ -131,9 +169,16 @@ export const settingsAPIs = {
             location: "Paris",
             operator: "Witness: zapata42-witness",
             contact: "telegram:Zapata_42"
+        },
+        {
+            url: "wss://testnet.bts.dcn.cx/ws",
+            region: "TESTNET - Europe",
+            country: "Germany / Finland",
+            location: "Nurenberg / Helsinki",
+            operator: "Witness: fla-test",
+            contact: "telegram:Otherego;telegram:BarefootMouse"
         }
     ],
     DEFAULT_FAUCET: getFaucet().url,
-    TESTNET_FAUCET: "https://faucet.testnet.bitshares.eu",
-    RPC_URL: "https://openledger.info/api/"
+    TESTNET_FAUCET: "https://faucet.testnet.bitshares.eu"
 };
