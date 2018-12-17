@@ -123,76 +123,12 @@ export function getMyMarketsQuotes() {
 export function getFeaturedMarkets(quotes = []) {
     return [
         ["USD", "BTS"],
-        ["USD", "OPEN.BTC"],
-        ["USD", "OPEN.USDT"],
-        ["USD", "OPEN.ETH"],
-        ["USD", "OPEN.DASH"],
         ["USD", "GOLD"],
-        ["USD", "GDEX.BTC"],
-        ["USD", "GDEX.ETH"],
-        ["USD", "GDEX.EOS"],
-        ["USD", "GDEX.BTO"],
-        ["USD", "OPEN.EOSDAC"],
         ["CNY", "BTS"],
-        ["CNY", "OPEN.BTC"],
         ["CNY", "USD"],
-        ["CNY", "OPEN.ETH"],
-        ["CNY", "YOYOW"],
-        ["CNY", "OCT"],
-        ["CNY", "GDEX.BTC"],
-        ["CNY", "GDEX.ETH"],
-        ["CNY", "GDEX.EOS"],
-        ["CNY", "GDEX.BTO"],
-        ["CNY", "GDEX.BTM"],
-        ["OPEN.BTC", "BTS"],
-        ["OPEN.BTC", "OPEN.ETH"],
-        ["OPEN.BTC", "OPEN.DASH"],
-        ["OPEN.BTC", "OPEN.DGD"],
-        ["OPEN.BTC", "OPEN.STEEM"],
-        ["BTS", "OPEN.ETH"],
-        ["BTS", "OPEN.EOS"],
-        ["BTS", "PPY"],
-        ["BTS", "OPEN.STEEM"],
-        ["BTS", "OBITS"],
         ["BTS", "RUBLE"],
-        ["BTS", "OCT"],
         ["BTS", "SILVER"],
-        ["BTS", "GOLD"],
-        ["BTS", "BTWTY"],
-        ["BTS", "SMOKE"],
-        ["BTS", "GDEX.BTC"],
-        ["BTS", "GDEX.ETH"],
-        ["BTS", "GDEX.EOS"],
-        ["BTS", "GDEX.BTO"],
-        ["BTS", "OPEN.EOSDAC"],
-        ["KAPITAL", "OPEN.BTC"],
-        ["USD", "OPEN.STEEM"],
-        ["USD", "OPEN.MAID"],
-        ["OPEN.USDT", "OPEN.BTC"],
-        ["OPEN.BTC", "OPEN.MAID"],
-        ["BTS", "OPEN.MAID"],
-        ["BTS", "OPEN.HEAT"],
-        ["BTS", "OPEN.INCENT"],
-        ["HEMPSWEET", "OPEN.BTC"],
-        ["KAPITAL", "BTS"],
-        ["BTS", "RUDEX.STEEM"],
-        ["USD", "RUDEX.STEEM"],
-        ["BTS", "RUDEX.SBD"],
-        ["BTS", "RUDEX.KRM"],
-        ["USD", "RUDEX.KRM"],
-        ["RUBLE", "RUDEX.GOLOS"],
-        ["CNY", "RUDEX.GOLOS"],
-        ["RUBLE", "RUDEX.GBG"],
-        ["CNY", "RUDEX.GBG"],
-        ["BTS", "RUDEX.MUSE"],
-        ["BTS", "RUDEX.TT"],
-        ["BTS", "RUDEX.SCR"],
-        ["BTS", "RUDEX.ETH"],
-        ["BTS", "RUDEX.DGB"],
-        ["BTS", "XBTSX.STH"],
-        ["BTS", "ZEPH"],
-        ["BTS", "HERTZ"][("BTS", "SPARKDEX.BTC")],
-        ["BTS", "SPARKDEX.ETH"]
+        ["BTS", "GOLD"]
     ].filter(a => {
         if (!quotes.length) return true;
         return quotes.indexOf(a[0]) !== -1;
@@ -206,15 +142,14 @@ export function getFeaturedMarkets(quotes = []) {
  */
 export function getAssetNamespaces() {
     return [
-        "TRADE.",
         "OPEN.",
-        "METAEX.",
-        "BRIDGE.",
         "RUDEX.",
-        "GDEX.",
         "WIN.",
+        "BRIDGE.",
+        "GDEX.",
         "XBTSX.",
-        "SPARKDEX."
+        "SPARKDEX.",
+        "CITADEL."
     ];
 }
 
@@ -235,9 +170,16 @@ export function getAssetHideNamespaces() {
 export function allowedGateway(gateway) {
     return false;
     return (
-        ["OPEN", "RUDEX", "WIN", "BRIDGE", "GDEX", "XBTSX", "SPARKDEX"].indexOf(
-            gateway
-        ) >= 0
+        [
+            "OPEN",
+            "RUDEX",
+            "WIN",
+            "BRIDGE",
+            "GDEX",
+            "XBTSX",
+            "SPARKDEX",
+            "CITADEL"
+        ].indexOf(gateway) >= 0
     );
 }
 

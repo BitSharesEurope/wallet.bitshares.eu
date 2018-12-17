@@ -588,8 +588,13 @@ class WithdrawModalNew extends React.Component {
         if (parseFloat(e.target.value) == e.target.value) {
             input = e.target.value.trim();
         } else {
-            input =
-                parseFloat(e.target.value.trim().replace(/[^\d.-]/g, "")) || 0;
+            var pasteValue = e.target.value.trim().replace(/[^\d.,-]/g, "");
+            var decimal = pasteValue.match(/(\,\d{1,2})$/g);
+            var decimalCount = decimal ? decimal.length : 0;
+            if (decimal && decimalCount) {
+                pasteValue = pasteValue.replace(",", ".");
+            }
+            input = parseFloat(pasteValue.replace(",", "")) || 0;
         }
         this.setState({quantity: input});
     }
@@ -1349,6 +1354,8 @@ class WithdrawModalWrapper extends React.Component {
 
     render() {
         const {props} = this;
+
+        if (!props.account) return null;
 
         let balances = props.account.get("balances");
         let assets = Immutable.fromJS({});
