@@ -17,7 +17,8 @@ import assetUtils from "common/asset_utils";
 import DatePicker from "react-datepicker2/src/";
 import moment from "moment";
 import Icon from "../Icon/Icon";
-import {Button, Select, Popover} from "bitshares-ui-style-guide";
+import SettleModal from "../Modal/SettleModal";
+import {Button, Select, Popover, Tooltip} from "bitshares-ui-style-guide";
 import ReactTooltip from "react-tooltip";
 
 class BuySell extends React.Component {
@@ -38,8 +39,12 @@ class BuySell extends React.Component {
     constructor() {
         super();
         this.state = {
-            forceReRender: false
+            forceReRender: false,
+            isSettleModalVisible: false
         };
+
+        this.showSettleModal = this.showSettleModal.bind(this);
+        this.hideSettleModal = this.hideSettleModal.bind(this);
     }
 
     /*
@@ -68,6 +73,8 @@ class BuySell extends React.Component {
         this._forceRender(nextProps, nextState);
 
         return (
+            nextState.isSettleModalVisible !==
+                this.state.isSettleModalVisible ||
             nextProps.amount !== this.props.amount ||
             nextProps.onBorrow !== this.props.onBorrow ||
             nextProps.total !== this.props.total ||
@@ -93,6 +100,18 @@ class BuySell extends React.Component {
             nextProps.hideFunctionButtons !== this.props.hideFunctionButtons ||
             nextState.isQuickDepositVisible !== this.state.isQuickDepositVisible
         );
+    }
+
+    showSettleModal() {
+        this.setState({
+            isSettleModalVisible: true
+        });
+    }
+
+    hideSettleModal() {
+        this.setState({
+            isSettleModalVisible: false
+        });
     }
 
     _addBalance(balance) {
@@ -218,89 +237,95 @@ class BuySell extends React.Component {
         );
         var baseMarketFee = baseFlagBooleans["charge_market_fee"] ? (
             verticalOrderForm ? (
-                <div
-                    data-tip={counterpart.translate("tooltip.market_fee", {
+                <Tooltip
+                    title={counterpart.translate("tooltip.market_fee", {
                         percent: baseMarketFeePercent,
                         asset: (basePrefix || "") + baseName
                     })}
-                    className="grid-block no-overflow wrap shrink"
                 >
-                    <div className="small-12 buy-sell-label">
-                        <Translate content="explorer.asset.summary.market_fee" />
-                        , {baseMarketFeePercent}
+                    <div className="grid-block no-overflow wrap shrink">
+                        <div className="small-12 buy-sell-label">
+                            <Translate content="explorer.asset.summary.market_fee" />
+                            , {baseMarketFeePercent}
+                        </div>
+                        <div className="inputAddon small-12">
+                            <ExchangeInput
+                                placeholder="0.0"
+                                id="baseMarketFee"
+                                defaultValue={baseFee}
+                                value={baseFee}
+                                addonAfter={
+                                    <span>
+                                        <AssetName
+                                            noTip
+                                            name={base.get("symbol")}
+                                        />
+                                    </span>
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className="inputAddon small-12">
-                        <ExchangeInput
-                            placeholder="0.0"
-                            id="baseMarketFee"
-                            defaultValue={baseFee}
-                            addonAfter={
-                                <span>
-                                    <AssetName
-                                        noTip
-                                        name={base.get("symbol")}
-                                    />
-                                </span>
-                            }
-                        />
-                    </div>
-                </div>
+                </Tooltip>
             ) : singleColumnForm ? (
-                <div
-                    data-tip={counterpart.translate("tooltip.market_fee", {
+                <Tooltip
+                    title={counterpart.translate("tooltip.market_fee", {
                         percent: baseMarketFeePercent,
                         asset: (basePrefix || "") + baseName
                     })}
-                    className="grid-block no-overflow wrap shrink"
                 >
-                    <div className="small-3 buy-sell-label">
-                        <Translate content="explorer.asset.summary.market_fee" />
-                        , {baseMarketFeePercent}
+                    <div className="grid-block no-overflow wrap shrink">
+                        <div className="small-3 buy-sell-label">
+                            <Translate content="explorer.asset.summary.market_fee" />
+                            , {baseMarketFeePercent}
+                        </div>
+                        <div className="inputAddon small-9">
+                            <ExchangeInput
+                                placeholder="0.0"
+                                id="baseMarketFee"
+                                defaultValue={baseFee}
+                                value={baseFee}
+                                addonAfter={
+                                    <span>
+                                        <AssetName
+                                            noTip
+                                            name={base.get("symbol")}
+                                        />
+                                    </span>
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className="inputAddon small-9">
-                        <ExchangeInput
-                            placeholder="0.0"
-                            id="baseMarketFee"
-                            defaultValue={baseFee}
-                            addonAfter={
-                                <span>
-                                    <AssetName
-                                        noTip
-                                        name={base.get("symbol")}
-                                    />
-                                </span>
-                            }
-                        />
-                    </div>
-                </div>
+                </Tooltip>
             ) : (
-                <div
-                    data-tip={counterpart.translate("tooltip.market_fee", {
+                <Tooltip
+                    title={counterpart.translate("tooltip.market_fee", {
                         percent: baseMarketFeePercent,
                         asset: (basePrefix || "") + baseName
                     })}
-                    className="grid-block no-overflow wrap shrink"
                 >
-                    <div className="small-12 buy-sell-label">
-                        <Translate content="explorer.asset.summary.market_fee" />
-                        , {baseMarketFeePercent}
+                    <div className="grid-block no-overflow wrap shrink">
+                        <div className="small-12 buy-sell-label">
+                            <Translate content="explorer.asset.summary.market_fee" />
+                            , {baseMarketFeePercent}
+                        </div>
+                        <div className="inputAddon small-12">
+                            <ExchangeInput
+                                placeholder="0.0"
+                                id="baseMarketFee"
+                                defaultValue={baseFee}
+                                value={baseFee}
+                                addonAfter={
+                                    <span>
+                                        <AssetName
+                                            noTip
+                                            name={base.get("symbol")}
+                                        />
+                                    </span>
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className="inputAddon small-12">
-                        <ExchangeInput
-                            placeholder="0.0"
-                            id="baseMarketFee"
-                            defaultValue={baseFee}
-                            addonAfter={
-                                <span>
-                                    <AssetName
-                                        noTip
-                                        name={base.get("symbol")}
-                                    />
-                                </span>
-                            }
-                        />
-                    </div>
-                </div>
+                </Tooltip>
             )
         ) : null;
 
@@ -309,92 +334,98 @@ class BuySell extends React.Component {
         );
         var quoteMarketFee = quoteFlagBooleans["charge_market_fee"] ? (
             verticalOrderForm ? (
-                <div
-                    data-tip={counterpart.translate("tooltip.market_fee", {
+                <Tooltip
+                    title={counterpart.translate("tooltip.market_fee", {
                         percent: quoteMarketFeePercent,
                         asset: (quotePrefix || "") + quoteName
                     })}
-                    className="grid-block no-overflow wrap shrink"
                 >
-                    <div className="small-12 buy-sell-label">
-                        <Translate content="explorer.asset.summary.market_fee" />
-                        , {quoteMarketFeePercent}
+                    <div className="grid-block no-overflow wrap shrink">
+                        <div className="small-12 buy-sell-label">
+                            <Translate content="explorer.asset.summary.market_fee" />
+                            , {quoteMarketFeePercent}
+                        </div>
+                        <div className="inputAddon small-12">
+                            <ExchangeInput
+                                placeholder="0.0"
+                                id="quoteMarketFee"
+                                defaultValue={quoteFee}
+                                value={quoteFee}
+                                addonAfter={
+                                    <span>
+                                        <AssetName
+                                            style={{width: 100}}
+                                            noTip
+                                            name={quote.get("symbol")}
+                                        />
+                                    </span>
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className="inputAddon small-12">
-                        <ExchangeInput
-                            placeholder="0.0"
-                            id="quoteMarketFee"
-                            defaultValue={quoteFee}
-                            addonAfter={
-                                <span>
-                                    <AssetName
-                                        style={{width: 100}}
-                                        noTip
-                                        name={quote.get("symbol")}
-                                    />
-                                </span>
-                            }
-                        />
-                    </div>
-                </div>
+                </Tooltip>
             ) : singleColumnForm ? (
-                <div
-                    data-tip={counterpart.translate("tooltip.market_fee", {
+                <Tooltip
+                    title={counterpart.translate("tooltip.market_fee", {
                         percent: quoteMarketFeePercent,
                         asset: (quotePrefix || "") + quoteName
                     })}
-                    className="grid-block no-overflow wrap shrink"
                 >
-                    <div className="small-3 buy-sell-label">
-                        <Translate content="explorer.asset.summary.market_fee" />
-                        , {quoteMarketFeePercent}
+                    <div className="grid-block no-overflow wrap shrink">
+                        <div className="small-3 buy-sell-label">
+                            <Translate content="explorer.asset.summary.market_fee" />
+                            , {quoteMarketFeePercent}
+                        </div>
+                        <div className="inputAddon small-9">
+                            <ExchangeInput
+                                placeholder="0.0"
+                                id="quoteMarketFee"
+                                defaultValue={quoteFee}
+                                value={quoteFee}
+                                addonAfter={
+                                    <span>
+                                        <AssetName
+                                            style={{width: 100}}
+                                            noTip
+                                            name={quote.get("symbol")}
+                                        />
+                                    </span>
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className="inputAddon small-9">
-                        <ExchangeInput
-                            placeholder="0.0"
-                            id="quoteMarketFee"
-                            defaultValue={quoteFee}
-                            addonAfter={
-                                <span>
-                                    <AssetName
-                                        style={{width: 100}}
-                                        noTip
-                                        name={quote.get("symbol")}
-                                    />
-                                </span>
-                            }
-                        />
-                    </div>
-                </div>
+                </Tooltip>
             ) : (
-                <div
-                    data-tip={counterpart.translate("tooltip.market_fee", {
+                <Tooltip
+                    title={counterpart.translate("tooltip.market_fee", {
                         percent: quoteMarketFeePercent,
                         asset: (quotePrefix || "") + quoteName
                     })}
-                    className="grid-block no-overflow wrap shrink"
                 >
-                    <div className="small-12 buy-sell-label">
-                        <Translate content="explorer.asset.summary.market_fee" />
-                        , {quoteMarketFeePercent}
+                    <div className="grid-block no-overflow wrap shrink">
+                        <div className="small-12 buy-sell-label">
+                            <Translate content="explorer.asset.summary.market_fee" />
+                            , {quoteMarketFeePercent}
+                        </div>
+                        <div className="inputAddon small-12">
+                            <ExchangeInput
+                                placeholder="0.0"
+                                id="quoteMarketFee"
+                                defaultValue={quoteFee}
+                                value={quoteFee}
+                                addonAfter={
+                                    <span>
+                                        <AssetName
+                                            style={{width: 100}}
+                                            noTip
+                                            name={quote.get("symbol")}
+                                        />
+                                    </span>
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className="inputAddon small-12">
-                        <ExchangeInput
-                            placeholder="0.0"
-                            id="quoteMarketFee"
-                            defaultValue={quoteFee}
-                            addonAfter={
-                                <span>
-                                    <AssetName
-                                        style={{width: 100}}
-                                        noTip
-                                        name={quote.get("symbol")}
-                                    />
-                                </span>
-                            }
-                        />
-                    </div>
-                </div>
+                </Tooltip>
             )
         ) : null;
 
@@ -923,6 +954,12 @@ class BuySell extends React.Component {
             );
         }
 
+        const otherAsset = isBid ? base : quote;
+        const isBitAsset = !!otherAsset.get("bitasset");
+        // check if globally settled
+        const isGloballySettled =
+            isBitAsset && otherAsset.get("bitasset").get("settlement_fund") > 0;
+
         return (
             <div
                 className={cnames(this.props.className)}
@@ -931,7 +968,7 @@ class BuySell extends React.Component {
                 <div
                     className="buy-sell-container"
                     style={{paddingRight: 5}}
-                    data-intro={dataIntro}
+                    //data-intro={dataIntro}
                 >
                     {!hideHeader ? (
                         <div className={"exchange-content-header " + type}>
@@ -1149,21 +1186,29 @@ class BuySell extends React.Component {
                                 ) : null}
                                 <div style={{marginTop: 10}}>
                                     <div>
-                                        <Button
-                                            data-tip={
+                                        <Tooltip
+                                            placement="top"
+                                            title={
                                                 disabledText ? disabledText : ""
                                             }
-                                            data-place="top"
-                                            className={
-                                                disabled ? null : buttonClass
-                                            }
-                                            disabled={disabled}
-                                            onClick={onSubmit.bind(this, true)}
-                                            type="primary"
-                                            style={{margin: 5}}
                                         >
-                                            {isBid ? "Buy" : "Sell"}
-                                        </Button>
+                                            <Button
+                                                className={
+                                                    disabled
+                                                        ? null
+                                                        : buttonClass
+                                                }
+                                                disabled={disabled}
+                                                onClick={onSubmit.bind(
+                                                    this,
+                                                    true
+                                                )}
+                                                type="primary"
+                                                style={{margin: 5}}
+                                            >
+                                                {isBid ? "Buy" : "Sell"}
+                                            </Button>
+                                        </Tooltip>
                                         {/* <Button
                                             style={{margin: 5}}
                                             onClick={this.props.clearForm.bind(this, isBid)}
@@ -1173,19 +1218,8 @@ class BuySell extends React.Component {
 
                                         {this.props.currentBridges &&
                                         !this.props.backedCoin ? (
-                                            <Button
-                                                style={{margin: 5}}
-                                                onClick={this.props.onBuy.bind(
-                                                    this
-                                                )}
-                                                disabled={
-                                                    !this.props
-                                                        .currentAccount ||
-                                                    this.props.currentAccount.get(
-                                                        "id"
-                                                    ) === "1.2.3"
-                                                }
-                                                data-tip={counterpart.translate(
+                                            <Tooltip
+                                                title={counterpart.translate(
                                                     "exchange.quick_deposit_bridge",
                                                     {
                                                         target: isBid
@@ -1194,43 +1228,60 @@ class BuySell extends React.Component {
                                                     }
                                                 )}
                                             >
-                                                <Translate
-                                                    content="exchange.quick_deposit"
-                                                    asset={
-                                                        isBid
-                                                            ? baseName
-                                                            : quoteName
+                                                <Button
+                                                    style={{margin: 5}}
+                                                    onClick={this.props.onBuy.bind(
+                                                        this
+                                                    )}
+                                                    disabled={
+                                                        !this.props
+                                                            .currentAccount ||
+                                                        this.props.currentAccount.get(
+                                                            "id"
+                                                        ) === "1.2.3"
                                                     }
-                                                />
-                                            </Button>
+                                                >
+                                                    <Translate
+                                                        content="exchange.quick_deposit"
+                                                        asset={
+                                                            isBid
+                                                                ? baseName
+                                                                : quoteName
+                                                        }
+                                                    />
+                                                </Button>
+                                            </Tooltip>
                                         ) : null}
                                         {this.props.backedCoin &&
                                         !this.props.currentBridges ? (
-                                            <Button
-                                                style={{margin: 5}}
-                                                onClick={this.props.onDeposit.bind(
-                                                    this
-                                                )}
-                                                disabled={
-                                                    !this.props
-                                                        .currentAccount ||
-                                                    this.props.currentAccount.get(
-                                                        "id"
-                                                    ) === "1.2.3"
-                                                }
-                                                data-tip={counterpart.translate(
+                                            <Tooltip
+                                                title={counterpart.translate(
                                                     "tooltip.gateway"
                                                 )}
                                             >
-                                                <Translate
-                                                    content="exchange.quick_deposit"
-                                                    asset={
-                                                        isBid
-                                                            ? baseName
-                                                            : quoteName
+                                                <Button
+                                                    style={{margin: 5}}
+                                                    onClick={this.props.onDeposit.bind(
+                                                        this
+                                                    )}
+                                                    disabled={
+                                                        !this.props
+                                                            .currentAccount ||
+                                                        this.props.currentAccount.get(
+                                                            "id"
+                                                        ) === "1.2.3"
                                                     }
-                                                />
-                                            </Button>
+                                                >
+                                                    <Translate
+                                                        content="exchange.quick_deposit"
+                                                        asset={
+                                                            isBid
+                                                                ? baseName
+                                                                : quoteName
+                                                        }
+                                                    />
+                                                </Button>
+                                            </Tooltip>
                                         ) : null}
                                         {this.props.currentBridges &&
                                         this.props.backedCoin ? (
@@ -1256,14 +1307,8 @@ class BuySell extends React.Component {
                                                 }
                                                 content={
                                                     <div>
-                                                        <Button
-                                                            style={{
-                                                                marginRight: 5
-                                                            }}
-                                                            onClick={this.onDeposit.bind(
-                                                                this
-                                                            )}
-                                                            data-tip={counterpart.translate(
+                                                        <Tooltip
+                                                            title={counterpart.translate(
                                                                 "exchange.quick_deposit_gateway",
                                                                 {
                                                                     asset: isBid
@@ -1272,14 +1317,20 @@ class BuySell extends React.Component {
                                                                 }
                                                             )}
                                                         >
-                                                            <Translate content="exchange.quick_deposit_gateway_button" />
-                                                        </Button>
+                                                            <Button
+                                                                style={{
+                                                                    marginRight: 5
+                                                                }}
+                                                                onClick={this.onDeposit.bind(
+                                                                    this
+                                                                )}
+                                                            >
+                                                                <Translate content="exchange.quick_deposit_gateway_button" />
+                                                            </Button>
+                                                        </Tooltip>
 
-                                                        <Button
-                                                            onClick={this.onBuy.bind(
-                                                                this
-                                                            )}
-                                                            data-tip={counterpart.translate(
+                                                        <Tooltip
+                                                            title={counterpart.translate(
                                                                 "exchange.quick_deposit_bridge",
                                                                 {
                                                                     target: isBid
@@ -1288,21 +1339,19 @@ class BuySell extends React.Component {
                                                                 }
                                                             )}
                                                         >
-                                                            <Translate content="exchange.quick_deposit_bridge_button" />
-                                                        </Button>
+                                                            <Button
+                                                                onClick={this.onBuy.bind(
+                                                                    this
+                                                                )}
+                                                            >
+                                                                <Translate content="exchange.quick_deposit_bridge_button" />
+                                                            </Button>
+                                                        </Tooltip>
                                                     </div>
                                                 }
                                             >
-                                                <Button
-                                                    style={{margin: 5}}
-                                                    disabled={
-                                                        !this.props
-                                                            .currentAccount ||
-                                                        this.props.currentAccount.get(
-                                                            "id"
-                                                        ) === "1.2.3"
-                                                    }
-                                                    data-tip={counterpart.translate(
+                                                <Tooltip
+                                                    title={counterpart.translate(
                                                         "exchange.quick_deposit_tooltip",
                                                         {
                                                             asset: isBid
@@ -1311,18 +1360,30 @@ class BuySell extends React.Component {
                                                         }
                                                     )}
                                                 >
-                                                    <Translate
-                                                        content="exchange.quick_deposit"
-                                                        asset={
-                                                            isBid
-                                                                ? baseName
-                                                                : quoteName
+                                                    <Button
+                                                        style={{margin: 5}}
+                                                        disabled={
+                                                            !this.props
+                                                                .currentAccount ||
+                                                            this.props.currentAccount.get(
+                                                                "id"
+                                                            ) === "1.2.3"
                                                         }
-                                                    />
-                                                </Button>
+                                                    >
+                                                        <Translate
+                                                            content="exchange.quick_deposit"
+                                                            asset={
+                                                                isBid
+                                                                    ? baseName
+                                                                    : quoteName
+                                                            }
+                                                        />
+                                                    </Button>
+                                                </Tooltip>
                                             </Popover>
                                         ) : null}
-                                        {this.props.onBorrow ? (
+                                        {this.props.onBorrow &&
+                                        !isGloballySettled ? (
                                             <Button
                                                 style={{margin: 5}}
                                                 disabled={
@@ -1337,6 +1398,24 @@ class BuySell extends React.Component {
                                                 <Translate content="exchange.borrow" />
                                             </Button>
                                         ) : null}
+                                        {isGloballySettled ? (
+                                            <Button
+                                                style={{margin: 5}}
+                                                disabled={
+                                                    !this.props
+                                                        .currentAccount ||
+                                                    this.props.currentAccount.get(
+                                                        "id"
+                                                    ) === "1.2.3"
+                                                }
+                                                onClick={this.showSettleModal}
+                                                data-tip={counterpart.translate(
+                                                    "exchange.settle_globally_settled_tooltip"
+                                                )}
+                                            >
+                                                <Translate content="exchange.settle_globally_settled" />
+                                            </Button>
+                                        ) : null}
                                     </div>
                                 </div>
                             </div>
@@ -1345,39 +1424,60 @@ class BuySell extends React.Component {
                             <div className="grid-content clear-fix no-padding">
                                 {/* SHORT button */}
                                 {disabledText && isPredictionMarket ? (
-                                    <div
-                                        style={{paddingRight: 10}}
-                                        className="float-right"
-                                        data-tip={disabledText}
-                                        data-place="right"
+                                    <Tooltip
+                                        title={disabledText}
+                                        placement="right"
                                     >
-                                        <input
-                                            style={{margin: 0}}
-                                            className={buttonClass}
-                                            type="submit"
-                                            onClick={onSubmit.bind(this, false)}
-                                            value={forceSellText}
-                                        />
-                                    </div>
+                                        <div
+                                            style={{paddingRight: 10}}
+                                            className="float-right"
+                                        >
+                                            <input
+                                                style={{margin: 0}}
+                                                className={buttonClass}
+                                                type="submit"
+                                                onClick={onSubmit.bind(
+                                                    this,
+                                                    false
+                                                )}
+                                                value={forceSellText}
+                                            />
+                                        </div>
+                                    </Tooltip>
                                 ) : isPredictionMarket ? (
-                                    <div
-                                        style={{paddingRight: 10}}
-                                        className="float-right"
-                                        data-tip={""}
-                                    >
-                                        <input
-                                            style={{margin: 0}}
-                                            className={buttonClass}
-                                            type="submit"
-                                            onClick={onSubmit.bind(this, false)}
-                                            value={forceSellText}
-                                        />
-                                    </div>
+                                    <Tooltip title={""} placement="right">
+                                        <div
+                                            style={{paddingRight: 10}}
+                                            className="float-right"
+                                        >
+                                            <input
+                                                style={{margin: 0}}
+                                                className={buttonClass}
+                                                type="submit"
+                                                onClick={onSubmit.bind(
+                                                    this,
+                                                    false
+                                                )}
+                                                value={forceSellText}
+                                            />
+                                        </div>
+                                    </Tooltip>
                                 ) : null}
                             </div>
                         </div>
                     </form>
                 </div>
+
+                {isGloballySettled &&
+                    !!this.props.currentAccount && (
+                        <SettleModal
+                            visible={this.state.isSettleModalVisible}
+                            hideModal={this.hideSettleModal}
+                            showModal={this.showSettleModal}
+                            asset={otherAsset.get("id")}
+                            account={this.props.currentAccount.get("name")}
+                        />
+                    )}
             </div>
         );
     }

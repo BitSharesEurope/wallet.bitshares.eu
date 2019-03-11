@@ -32,5 +32,6 @@ addons:
             - xz-utils
 install:
     - npm ci
-script: "./build.sh"
+script:
+    - "./build.sh"
 after_success: "./deploy.sh"

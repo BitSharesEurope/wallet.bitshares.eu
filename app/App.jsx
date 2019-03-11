@@ -21,8 +21,10 @@ import titleUtils from "common/titleUtils";
 import {BodyClassName, Notification} from "bitshares-ui-style-guide";
 import {DEFAULT_NOTIFICATION_DURATION} from "services/Notification";
 import Loadable from "react-loadable";
+import Borrow from "./components/Showcases/Borrow";
+import Barter from "./components/Showcases/Barter";
 
-import {Route, Switch} from "react-router-dom";
+import {Route, Switch, Redirect} from "react-router-dom";
 
 // Nested route components
 import Page404 from "./components/Page404/Page404";
@@ -121,6 +123,7 @@ import RegistrationSelector from "./components/Registration/RegistrationSelector
 import WalletRegistration from "./components/Registration/WalletRegistration";
 import AccountRegistration from "./components/Registration/AccountRegistration";
 import {CreateWalletFromBrainkey} from "./components/Wallet/WalletCreate";
+import ShowcaseGrid from "./components/Showcases/ShowcaseGrid";
 import PriceAlertNotifications from "./components/PriceAlertNotifications";
 
 class App extends React.Component {
@@ -350,6 +353,13 @@ class App extends React.Component {
         } else if (__DEPRECATED__) {
             content = <Deprecate {...this.props} />;
         } else {
+            let accountName =
+                AccountStore.getState().currentAccount ||
+                AccountStore.getState().passwordAccount;
+            accountName =
+                accountName && accountName !== "null"
+                    ? accountName
+                    : "committee-account";
             content = (
                 <div className="grid-frame vertical">
                     <Header height={this.state.height} {...others} />
@@ -410,7 +420,12 @@ class App extends React.Component {
                                     component={AccountRegistration}
                                 />
                                 <Route path="/news" exact component={News} />
-
+                                <Redirect
+                                    path={"/voting"}
+                                    to={{
+                                        pathname: `/account/${accountName}/voting`
+                                    }}
+                                />
                                 {/* Explorer routes */}
                                 <Route
                                     path="/explorer/:tab"
@@ -430,6 +445,14 @@ class App extends React.Component {
                                     exact
                                     path="/block/:height/:txIndex"
                                     component={Block}
+                                />
+                                <Route path="/borrow" component={Borrow} />
+
+                                <Route path="/barter" component={Barter} />
+
+                                <Route
+                                    path="/spotlight"
+                                    component={ShowcaseGrid}
                                 />
 
                                 {/* Wallet backup/restore routes */}
