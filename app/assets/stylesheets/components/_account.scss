@@ -469,6 +469,22 @@ div.tabs-container {
     }
 }
 
+.account-treemap--legend {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    .legend-item {
+        display: flex;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        .legend-square {
+            height: 16px;
+            width: 16px;
+            margin-right: 5px;
+        }
+    }
+}
+
 .account-input-style-guide--account-status {
     float: right;
     color: $success-color;
@@ -482,4 +498,14 @@ div.tabs-container {
 }
 
 .account-input-style-guide {
+}
+
+.recent-transactions {
+    .iconLinkAndLabel {
+        span {
+            font-weight: bold;
+            margin-left: 0.5rem;
+            text-transform: uppercase;
+        }
+    }
 }

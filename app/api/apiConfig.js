@@ -137,36 +137,21 @@ export const settingsAPIs = {
             contact: "email:info@blockchainprojectsbv.com"
         },
         {
-            url: "wss://testnet.bitshares.apasia.tech/ws",
-            region: "TESTNET - Northern America",
-            country: "U.S.A.",
-            location: "Dallas",
-            operator: "Flash Infrastructure Worker",
-            contact: "telegram:murda_ra"
-        },
-        {
-            url: "wss://testnet-eu.bitshares.apasia.tech/ws",
-            region: "TESTNET - Northern Europe",
-            country: "Netherlands",
-            location: "Amsterdam",
-            operator: "Flash Infrastructure Worker",
-            contact: "telegram:murda_ra"
-        },
-        {
             url: "wss://testnet.dex.trading/",
             region: "TESTNET - Western Europe",
             country: "France",
             location: "Paris",
             operator: "Witness: zapata42-witness",
             contact: "telegram:Zapata_42"
-        },
+        }
+    ],
+    ES_WRAPPER_LIST: [
         {
-            url: "wss://testnet.bts.dcn.cx/ws",
-            region: "TESTNET - Europe",
-            country: "Germany / Finland",
-            location: "Nurenberg / Helsinki",
-            operator: "Witness: fla-test",
-            contact: "telegram:Otherego;telegram:BarefootMouse"
+            url: "https://wrapper.elasticsearch.bitshares.ws",
+            region: "Western Europe",
+            country: "Germany",
+            operator: "Infrastructure Worker",
+            contact: "email:info@blockchainprojectsbv.com"
         }
     ],
     DEFAULT_FAUCET: getFaucet().url,

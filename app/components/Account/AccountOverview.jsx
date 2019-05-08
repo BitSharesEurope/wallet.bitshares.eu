@@ -79,6 +79,7 @@ class AccountOverview extends React.Component {
         return (
             !utils.are_equal_shallow(nextProps.balances, this.props.balances) ||
             nextProps.account !== this.props.account ||
+            nextProps.isMyAccount !== this.props.isMyAccount ||
             nextProps.settings !== this.props.settings ||
             nextProps.hiddenAssets !== this.props.hiddenAssets ||
             !utils.are_equal_shallow(nextState, this.state) ||
@@ -458,7 +459,7 @@ class AccountOverview extends React.Component {
 
         // add unicode non-breaking space as subtext to Activity Tab to ensure that all titles are aligned
         // horizontally
-        const hiddenSubText = "\u00a0";
+        const hiddenSubText = "\u00a0 ";
 
         return (
             <div className="grid-content app-tables no-padding" ref="appTables">
