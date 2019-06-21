@@ -1,8 +1,24 @@
+import {Apis} from "bitsharesjs-ws";
+
 /** This file centralized customization and branding efforts throughout the whole wallet and is meant to facilitate
  *  the process.
  *
  *  @author Stefan Schiessl <stefan.schiessl@blockchainprojectsbv.com>
  */
+
+/**
+ * Determine if we are running on testnet or mainnet
+ * @private
+ */
+function _isTestnet() {
+    const chainId = (Apis.instance().chain_id || "4018d784").substr(0, 8);
+    if (chainId === "4018d784") {
+        return false;
+    } else {
+        // treat every other chain as testnet, exact would be chainId === "39f5e2ed"
+        return true;
+    }
+}
 
 /**
  * Wallet name that is used throughout the UI and also in translations
@@ -64,12 +80,12 @@ export function getDefaultLogin() {
  *
  * @returns {[string,string,string,string,string,string]}
  */
-export function getUnits(chainId = "4018d784") {
-    if (chainId === "4018d784")
+export function getUnits() {
+    if (_isTestnet()) {
+        return ["TEST"];
+    } else {
         return ["BTS", "USD", "CNY", "BTC", "EUR", "GBP"];
-    else if (chainId === "39f5e2ed") return ["TEST"];
-    // unknown chain id: (need to return at least one unit)
-    else return ["BTS"];
+    }
 }
 
 /**
@@ -190,4 +206,12 @@ export function getSupportedLanguages() {
 export function getAllowedLogins() {
     // possible: list containing any combination of ["password", "wallet"]
     return ["password", "wallet"];
+}
+
+export function getHeadFeedAsset() {
+    if (_isTestnet()) {
+        return ["NOTIFICATIONS"];
+    } else {
+        return ["TEST"];
+    }
 }
